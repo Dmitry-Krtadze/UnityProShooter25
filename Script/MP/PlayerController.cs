@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
         walkSpeed, sprintSpeed, mouseSensitivity,
         jumpForce, smoothTime;
     private float vertacalLookRotation;
-    private bool isGround;
+    [SerializeField]  private bool isGround;
     private Vector3 smothMove;
     private Vector3 moveAmout;
     private Rigidbody rb;
@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviour
         if (!pnView.IsMine)
         {
             Destroy(playerCamera);
+            Destroy(rb);
         }
     }
     private void Update()
@@ -36,6 +37,7 @@ public class PlayerController : MonoBehaviour
         }
         Look();
         Movement();
+        Jump();
     }
     private void Look()
     {
@@ -65,5 +67,20 @@ public class PlayerController : MonoBehaviour
         }
         rb.MovePosition(rb.position + transform.TransformDirection(
             moveAmout) * Time.fixedDeltaTime);
+    }
+
+    private void Jump()
+    {
+        if(Input.GetKeyDown(KeyCode.Space) && isGround)
+        {
+            rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+            Debug.Log("Jump");
+        }
+        
+    }
+
+    public void GroundState(bool iSGround)
+    {
+        this.isGround = iSGround;
     }
 }
