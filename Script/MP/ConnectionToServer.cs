@@ -116,6 +116,7 @@ public class ConnectionToServer : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.NickName = PlayerNickNameField.GetComponent<TMP_InputField>().text;
         PrikolNaOtrabotke.text = PhotonNetwork.NickName;
+        PlayerPrefs.SetString("NickName", PhotonNetwork.NickName);
 
     }
     
