@@ -8,17 +8,9 @@ public class LookCamera : MonoBehaviour
 
     private void Awake()
     {
-        // Если камера не задана в инспекторе, ищем её среди детей PlayerController
-        if (myCamera == null)
-        {
-            myCamera = GetComponentInParent<Camera>();
-        }
-
-        // В качестве альтернативы можно указать главную камеру, если она фиксирована
-        if (myCamera == null)
-        {
-            myCamera = Camera.main;
-        }
+      
+        myCamera = Camera.main;
+   
     }
 
     private void LateUpdate()
