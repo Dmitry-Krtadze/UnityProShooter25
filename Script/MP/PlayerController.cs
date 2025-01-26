@@ -2,8 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-public class PlayerController : MonoBehaviour
+using Photon.Realtime;
+
+using Hashtable = ExitGames.Client.Photon.Hashtable;
+public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 {
+
+    
+
+
     [SerializeField] GameObject playerCamera;
     [SerializeField]
     private float
@@ -16,10 +23,23 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     private PhotonView pnView;
 
+    [SerializeField] Item[] items;
+    private int itemIndex;
+    private int prevItemIndex = -1;
+
+
+    private float maxHealth = 100f;
+    private float currentHealth;
+    private PlayerManager playerManager;
+    private bool isCursorLocked = true;
     private void Awake()
     {
         pnView = GetComponent<PhotonView>();
         rb = GetComponent<Rigidbody>();
+
+        currentHealth = maxHealth;
+        playerManager = PhotonView.Find((int)pnView.InstantiationData[0]).
+            GetComponent<PlayerManager>();
     }
     private void Start()
     {
@@ -28,6 +48,12 @@ public class PlayerController : MonoBehaviour
             Destroy(playerCamera);
             Destroy(rb);
         }
+        else
+        {
+            EquipItem(0);
+        }
+
+        LockCursor();
     }
     private void Update()
     {
@@ -38,6 +64,43 @@ public class PlayerController : MonoBehaviour
         Look();
         Movement();
         Jump();
+        SelectWeapon();
+        UseItem();
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            // Переключаем состояние курсора
+            isCursorLocked = !isCursorLocked;
+
+            if (isCursorLocked)
+                LockCursor();
+            else
+                UnlockCursor();
+        }
+
+    }
+    private void UseItem()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            items[itemIndex].Use();
+        }
+    }
+    public void TakeDamage(float damage)
+    {
+        pnView.RPC("RPC_Damage", RpcTarget.All, damage);
+    }
+
+    [PunRPC]
+    void RPC_Damage(float damage)
+    {
+        if (!pnView.IsMine) return;
+        currentHealth -= damage;
+
+        if(currentHealth <= 0)
+        {
+            playerManager.Die();
+        }
     }
     private void Look()
     {
@@ -82,5 +145,55 @@ public class PlayerController : MonoBehaviour
     public void GroundState(bool iSGround)
     {
         this.isGround = iSGround;
+    }
+    private void SelectWeapon()
+    {
+        for(int i = 0;i < items.Length; i++)
+        {
+            if (Input.GetKeyDown((i + 1).ToString()))
+            {
+                EquipItem(i);
+                break;
+            }
+        }
+    }
+    private void EquipItem(int index)
+    {
+        if (index == prevItemIndex) return;
+        itemIndex = index;
+        items[itemIndex].itemGameObject.SetActive(true);
+
+        if(prevItemIndex != -1)
+        {
+            items[prevItemIndex].itemGameObject.SetActive(false);
+        }
+        prevItemIndex = itemIndex;
+
+        if (pnView.IsMine)
+        {
+            Hashtable hash = new Hashtable();
+            hash.Add("index", itemIndex);
+            PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
+        }
+    }
+
+    public void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+
+    {
+        if(!pnView.IsMine && targetPlayer == pnView.Owner)
+        {
+            EquipItem((int)changedProps["index"]);
+        }
+    }
+    private void LockCursor()
+    {
+        Cursor.lockState = CursorLockMode.Locked; // Фиксируем курсор в центре
+        Cursor.visible = false;                  // Скрываем курсор
+    }
+
+    private void UnlockCursor()
+    {
+        Cursor.lockState = CursorLockMode.None;  // Снимаем блокировку курсора
+        Cursor.visible = true;                   // Делаем курсор видимым
     }
 }

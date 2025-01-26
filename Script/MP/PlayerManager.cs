@@ -6,7 +6,7 @@ using System.IO;
 public class PlayerManager : MonoBehaviourPunCallbacks
 {
     private PhotonView ALLO;
-
+    private GameObject controller;
     private void Awake()
     {
         ALLO = GetComponent<PhotonView>();
@@ -20,8 +20,13 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     }
     private void CreateController()
     {
-        PhotonNetwork.Instantiate(Path.Combine(
-            "PlayerController"), Vector3.zero,
-            Quaternion.identity);
+        controller = PhotonNetwork.Instantiate(Path.Combine(
+             "PlayerController"), Vector3.zero,
+             Quaternion.identity, 0, new object[] {ALLO.ViewID });
+    }
+    public void Die()
+    {
+        PhotonNetwork.Destroy(controller);
+        CreateController();
     }
 }
