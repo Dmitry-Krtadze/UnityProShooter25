@@ -397,6 +397,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5003469535047610020}
+  - component: {fileID: 3169333266571919284}
   m_Layer: 0
   m_Name: FirstWeapon
   m_TagString: Untagged
@@ -420,6 +421,21 @@ Transform:
   m_Father: {fileID: 2167315302426362999}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3169333266571919284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7212649767461600285}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f407846ae93f0fa4e8852cffd1f881e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemInfo: {fileID: 11400000, guid: d99d891b8280ceb4f80f7eb2b13a50e7, type: 2}
+  itemGameObject: {fileID: 7212649767461600285}
+  myCam: {fileID: 8926392192150517603}
 --- !u!1 &8317252377379435518
 GameObject:
   m_ObjectHideFlags: 0
@@ -693,7 +709,9 @@ MonoBehaviour:
   jumpForce: 500
   smoothTime: 1
   isGround: 0
-  items: []
+  items:
+  - {fileID: 3169333266571919284}
+  - {fileID: 7172390170940926881}
 --- !u!114 &8926392193590416439
 MonoBehaviour:
   m_ObjectHideFlags: 0
