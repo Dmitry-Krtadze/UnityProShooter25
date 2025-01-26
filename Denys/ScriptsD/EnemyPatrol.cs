@@ -4,18 +4,19 @@ using UnityEngine;
 
 public class EnemyPatrol : MonoBehaviour
 {
-    [SerializeField] private float enemySpeed = 10f; // Скорость передвижения
+    [SerializeField] private float enemySpeed = 5f; // Скорость передвижения
     [SerializeField] private GameObject patrolIntoPlayer; // закинуть сюда игрока, чтобы враг следовал за игроком
+    [SerializeField] private float EnemyPatrolDistance = 6f;
     private int currentPointIndex = 0; // Индекс текущей точки
 
     private Transform[] patrolPoints; // Массив точек патруля
 
     void Start()
     {
-        // Если patrolIntoPlayer не присвоен в инспекторе, ищем объект с тегом "Player"
+        // Если patrolIntoPlayer не присвоен в инспекторе, пытаемся найти объект с тегом "Player"
         if (patrolIntoPlayer == null)
         {
-            patrolIntoPlayer = GameObject.FindGameObjectWithTag("Player");
+            StartCoroutine(FindPlayerWhenAvailable());
         }
 
         // Находим все объекты с тегом "PatrolPoint" и сохраняем их позиции
@@ -32,6 +33,27 @@ public class EnemyPatrol : MonoBehaviour
         transform.position = patrolPoints[0].position;
     }
 
+    // Корутину, которая будет искать игрока, если его еще нет
+    private IEnumerator FindPlayerWhenAvailable()
+    {
+        while (patrolIntoPlayer == null)
+        {
+            patrolIntoPlayer = GameObject.FindGameObjectWithTag("Player");
+
+            if (patrolIntoPlayer != null)
+            {
+                break; // Если нашли игрока, выходим из цикла
+            }
+
+            yield return null; // Ждем 1 кадр и пробуем снова
+        }
+
+        if (patrolIntoPlayer == null)
+        {
+            Debug.LogError("Player object not found! Make sure the player has the 'Player' tag.");
+        }
+    }
+
     void Update()
     {
         // Если нет точек, выходим из метода
@@ -41,7 +63,7 @@ public class EnemyPatrol : MonoBehaviour
         Transform targetPoint = patrolPoints[currentPointIndex];
 
         // Проверка на близость к игроку
-        if (patrolIntoPlayer != null && (transform.position - patrolIntoPlayer.transform.position).sqrMagnitude < 5 * 5)
+        if (patrolIntoPlayer != null && (transform.position - patrolIntoPlayer.transform.position).sqrMagnitude < EnemyPatrolDistance * EnemyPatrolDistance)
         {
             // Двигаем врага к игроку
             transform.position = Vector3.MoveTowards(transform.position, patrolIntoPlayer.transform.position, enemySpeed * Time.deltaTime);
