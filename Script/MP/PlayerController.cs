@@ -31,7 +31,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     private float maxHealth = 100f;
     private float currentHealth;
     private PlayerManager playerManager;
-
+    private bool isCursorLocked = true;
     private void Awake()
     {
         pnView = GetComponent<PhotonView>();
@@ -52,6 +52,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         {
             EquipItem(0);
         }
+
+        LockCursor();
     }
     private void Update()
     {
@@ -64,7 +66,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         Jump();
         SelectWeapon();
         UseItem();
-        
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            // Переключаем состояние курсора
+            isCursorLocked = !isCursorLocked;
+
+            if (isCursorLocked)
+                LockCursor();
+            else
+                UnlockCursor();
+        }
+
     }
     private void UseItem()
     {
@@ -171,5 +184,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         {
             EquipItem((int)changedProps["index"]);
         }
+    }
+    private void LockCursor()
+    {
+        Cursor.lockState = CursorLockMode.Locked; // Фиксируем курсор в центре
+        Cursor.visible = false;                  // Скрываем курсор
+    }
+
+    private void UnlockCursor()
+    {
+        Cursor.lockState = CursorLockMode.None;  // Снимаем блокировку курсора
+        Cursor.visible = true;                   // Делаем курсор видимым
     }
 }
