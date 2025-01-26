@@ -6,7 +6,7 @@ using UnityEngine.AI;
 public class EnemyPatrol : MonoBehaviour
 {
     [SerializeField] private GameObject Enemy;
-    [SerializeField] private int EnemySpeed = 10f;
+    [SerializeField] private int EnemySpeed = 10;
 
     void Start()
     {
