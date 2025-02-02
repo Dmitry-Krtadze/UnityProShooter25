@@ -1619,7 +1619,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemySpeed: 5
-  patrolIntoPlayer: {fileID: 0}
+  patrolIntoPlayer: {fileID: 8926392193590416436, guid: c2e17fec3702f964383b07902891847a, type: 3}
+  enemyPatrolDistance: 4
+  playerLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!54 &1793405316
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1837,6 +1841,10 @@ PrefabInstance:
     - target: {fileID: 6511695772861945186, guid: f5c5e785d393524488ddc08be83fc1fa, type: 3}
       propertyPath: m_Name
       value: Enemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 6511695772861945186, guid: f5c5e785d393524488ddc08be83fc1fa, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 6511695772861945246, guid: f5c5e785d393524488ddc08be83fc1fa, type: 3}
       propertyPath: m_RootOrder
