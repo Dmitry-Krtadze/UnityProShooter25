@@ -12,13 +12,11 @@ public class RecoilController : MonoBehaviour
     private Vector3 currentRecoil; // Текущая накопленная отдача
     private Vector3 targetRecoil;  // Желаемая отдача
 
-    private void Start()
+
+    private void Update()
     {
         pc = GetComponent<PlayerController>();
         cameraTransform = pc.playerCamera.GetComponent<Transform>();
-    }
-    private void Update()
-    {
         // Плавно возвращаем камеру в исходное положение
         currentRecoil = Vector3.Lerp(currentRecoil, Vector3.zero, returnSpeed * Time.deltaTime);
 

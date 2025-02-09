@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+
 public class UniversalSoundPlayer : MonoBehaviour
 {
     private AudioSource audioSource;
@@ -15,7 +16,7 @@ public class UniversalSoundPlayer : MonoBehaviour
 
     public void PlaySound(bool sync)
     {
-        if (sync && photonView != null && photonView.IsMine)
+        if (sync && photonView != null)
         {
             photonView.RPC("RPC_PlaySound", RpcTarget.All);
         }
@@ -28,6 +29,9 @@ public class UniversalSoundPlayer : MonoBehaviour
     [PunRPC]
     private void RPC_PlaySound()
     {
-        audioSource.Play();
+        if (audioSource != null)
+        {
+            audioSource.Play();
+        }
     }
 }
