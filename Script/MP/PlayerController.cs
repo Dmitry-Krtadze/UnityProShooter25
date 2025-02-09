@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
-
+using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 {
@@ -28,8 +28,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     private int prevItemIndex = -1;
 
 
-    private float maxHealth = 100f;
-    private float currentHealth;
+    [SerializeField] private float maxHealth = 100f;
+    [SerializeField] private float currentHealth;
+    [SerializeField] Slider hpBar;
     private PlayerManager playerManager;
     private bool isCursorLocked = true;
     [SerializeField]  GameObject FirstWeapon;
@@ -39,6 +40,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         rb = GetComponent<Rigidbody>();
 
         currentHealth = maxHealth;
+        hpBar.value = currentHealth;
         playerManager = PhotonView.Find((int)pnView.InstantiationData[0]).
             GetComponent<PlayerManager>();
         
@@ -104,8 +106,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     {
         if (!pnView.IsMine) return;
         currentHealth -= damage;
-
-        if(currentHealth <= 0)
+        hpBar.value = currentHealth;
+        if (currentHealth <= 0)
         {
             playerManager.Die();
         }
