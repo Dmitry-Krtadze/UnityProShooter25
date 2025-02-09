@@ -100,7 +100,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             
             GetComponent<RecoilController>().ApplyRecoil(weaponType);
         }
+        
     }
+
+    
     public void TakeDamage(float damage)
     {
         pnView.RPC("RPC_Damage", RpcTarget.All, damage);
@@ -200,6 +203,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             Hashtable hash = new Hashtable();
             hash.Add("index", itemIndex);
             PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
+        }
+        pnView.RPC("RPC_SyncWeapon", RpcTarget.All, itemIndex);
+    }
+    [PunRPC]
+    void RPC_SyncWeapon(int index)
+    {
+        if (!pnView.IsMine) // ƒл€ всех клиентов, кроме владельца
+        {
+            EquipItem(index); // Ёкипируем оружие, которое указано на других клиентах
         }
     }
 
