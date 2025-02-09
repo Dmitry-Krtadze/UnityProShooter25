@@ -40,7 +40,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         rb = GetComponent<Rigidbody>();
 
         currentHealth = maxHealth;
+        hpBar.maxValue = maxHealth;
         hpBar.value = currentHealth;
+
         playerManager = PhotonView.Find((int)pnView.InstantiationData[0]).
             GetComponent<PlayerManager>();
         
@@ -82,7 +84,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             else
                 UnlockCursor();
         }
-
+        hpBar.value = currentHealth;
     }
     private void UseItem()
     {
@@ -106,11 +108,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     {
         if (!pnView.IsMine) return;
         currentHealth -= damage;
-        hpBar.value = currentHealth;
+        
         if (currentHealth <= 0)
         {
             playerManager.Die();
         }
+        
     }
     private void Look()
     {
