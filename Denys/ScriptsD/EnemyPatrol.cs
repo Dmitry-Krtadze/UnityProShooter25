@@ -6,13 +6,17 @@ public class EnemyPatrol : MonoBehaviour
     [SerializeField] private float enemySpeed = 5f;
     [SerializeField] private GameObject patrolIntoPlayer;
     [SerializeField] private float enemyPatrolDistance = 6f; 
-    [SerializeField] private LayerMask playerLayerMask; // Слой, на котором находится игрок
+    [SerializeField] private LayerMask playerLayerMask;
 
     private int currentPointIndex = 0;
     private Transform[] patrolPoints;
+    private Rigidbody rb;
 
     void Start()
     {
+        rb = GetComponent<Rigidbody>();
+        rb.freezeRotation = true; // Запрещаем физическое вращение
+
         InitializePatrolPoints();
         StartCoroutine(FindPlayerWhenAvailable());
     }
@@ -40,7 +44,7 @@ public class EnemyPatrol : MonoBehaviour
         while (patrolIntoPlayer == null)
         {
             patrolIntoPlayer = GameObject.FindGameObjectWithTag("Player");
-            yield return null;
+            yield return new WaitForSeconds(0.1f); // Делаем паузу перед следующей попыткой поиска
         }
     }
 
@@ -93,28 +97,41 @@ public class EnemyPatrol : MonoBehaviour
 
     void ChasePlayer()
     {
-        transform.position = Vector3.MoveTowards(
-            transform.position,
-            patrolIntoPlayer.transform.position,
-            enemySpeed * Time.deltaTime
-        );
+        Vector3 targetPosition = patrolIntoPlayer.transform.position;
+        targetPosition.y = transform.position.y; // Фиксируем Y, чтобы враг не поднимался и не опускался
 
-        // Дополнительно: поворот в сторону игрока
-        transform.LookAt(patrolIntoPlayer.transform);
+        Vector3 direction = (targetPosition - transform.position).normalized;
+        rb.velocity = direction * enemySpeed; // Двигаем врага через физику
+
+        LookAtTarget(targetPosition);
     }
 
     void Patrol()
     {
         Transform targetPoint = patrolPoints[currentPointIndex];
-        transform.position = Vector3.MoveTowards(
-            transform.position,
-            targetPoint.position,
-            enemySpeed * Time.deltaTime
-        );
+        Vector3 targetPosition = targetPoint.position;
+        targetPosition.y = transform.position.y; // Оставляем текущую высоту
 
-        if (Vector3.Distance(transform.position, targetPoint.position) < 0.1f)
+        Vector3 direction = (targetPosition - transform.position).normalized;
+        rb.velocity = direction * enemySpeed; // Двигаем врага через физику
+
+        LookAtTarget(targetPosition);
+
+        if (Vector3.Distance(transform.position, targetPoint.position) < 0.5f)
         {
             currentPointIndex = (currentPointIndex + 1) % patrolPoints.Length;
+        }
+    }
+
+    void LookAtTarget(Vector3 targetPosition)
+    {
+        Vector3 direction = targetPosition - transform.position;
+        direction.y = 0; // Убираем наклон по оси Y
+
+        if (direction != Vector3.zero)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
         }
     }
 }
