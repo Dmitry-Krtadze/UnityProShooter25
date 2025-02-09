@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     
 
 
-    [SerializeField] GameObject playerCamera;
+    [SerializeField] public GameObject playerCamera;
     [SerializeField]
     private float
         walkSpeed, sprintSpeed, mouseSensitivity,
@@ -32,6 +32,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     private float currentHealth;
     private PlayerManager playerManager;
     private bool isCursorLocked = true;
+    [SerializeField]  GameObject FirstWeapon;
     private void Awake()
     {
         pnView = GetComponent<PhotonView>();
@@ -40,6 +41,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         currentHealth = maxHealth;
         playerManager = PhotonView.Find((int)pnView.InstantiationData[0]).
             GetComponent<PlayerManager>();
+        
+
     }
     private void Start()
     {
@@ -84,6 +87,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         if (Input.GetMouseButtonDown(0))
         {
             items[itemIndex].Use();
+            string weaponType = items[itemIndex].weaponType;
+            GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true);
+
+            
+            GetComponent<RecoilController>().ApplyRecoil(weaponType);
         }
     }
     public void TakeDamage(float damage)

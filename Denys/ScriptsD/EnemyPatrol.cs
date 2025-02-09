@@ -1,27 +1,34 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyPatrol : MonoBehaviour
 {
-    [SerializeField] private float enemySpeed = 5f; // Скорость передвижения
-    [SerializeField] private GameObject patrolIntoPlayer; // закинуть сюда игрока, чтобы враг следовал за игроком
-    [SerializeField] private float EnemyPatrolDistance = 6f;
-    private int currentPointIndex = 0; // Индекс текущей точки
+    [SerializeField] private float enemySpeed = 5f;
+    [SerializeField] private GameObject patrolIntoPlayer;
+    [SerializeField] private float enemyPatrolDistance = 6f; 
+    [SerializeField] private LayerMask playerLayerMask;
 
-    private Transform[] patrolPoints; // Массив точек патруля
+    private int currentPointIndex = 0;
+    private Transform[] patrolPoints;
+    private Rigidbody rb;
 
     void Start()
     {
-        // Если patrolIntoPlayer не присвоен в инспекторе, пытаемся найти объект с тегом "Player"
-        if (patrolIntoPlayer == null)
-        {
-            StartCoroutine(FindPlayerWhenAvailable());
-        }
+        rb = GetComponent<Rigidbody>();
+        rb.freezeRotation = true; // Запрещаем физическое вращение
 
-        // Находим все объекты с тегом "PatrolPoint" и сохраняем их позиции
+        InitializePatrolPoints();
+        StartCoroutine(FindPlayerWhenAvailable());
+    }
+
+    void InitializePatrolPoints()
+    {
         GameObject[] points = GameObject.FindGameObjectsWithTag("PatrolPoint");
-        if (points.Length == 0) return; // Если точек нет, выход из метода
+        if (points.Length == 0)
+        {
+            Debug.LogError("No patrol points found!");
+            return;
+        }
 
         patrolPoints = new Transform[points.Length];
         for (int i = 0; i < points.Length; i++)
@@ -29,56 +36,102 @@ public class EnemyPatrol : MonoBehaviour
             patrolPoints[i] = points[i].transform;
         }
 
-        // Устанавливаем позицию врага в первую точку патруля
         transform.position = patrolPoints[0].position;
     }
 
-    // Корутину, которая будет искать игрока, если его еще нет
     private IEnumerator FindPlayerWhenAvailable()
     {
         while (patrolIntoPlayer == null)
         {
             patrolIntoPlayer = GameObject.FindGameObjectWithTag("Player");
-
-            if (patrolIntoPlayer != null)
-            {
-                break; // Если нашли игрока, выходим из цикла
-            }
-
-            yield return null; // Ждем 1 кадр и пробуем снова
+            yield return new WaitForSeconds(0.1f); // Делаем паузу перед следующей попыткой поиска
         }
+    }
 
-        if (patrolIntoPlayer == null)
-        {
-            Debug.LogError("Player object not found! Make sure the player has the 'Player' tag.");
-        }
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, enemyPatrolDistance);
     }
 
     void Update()
     {
-        // Если нет точек, выходим из метода
         if (patrolPoints == null || patrolPoints.Length == 0) return;
 
-        // Текущая целевая точка
-        Transform targetPoint = patrolPoints[currentPointIndex];
+        CheckForPlayer();
 
-        // Проверка на близость к игроку
-        if (patrolIntoPlayer != null && (transform.position - patrolIntoPlayer.transform.position).sqrMagnitude < EnemyPatrolDistance * EnemyPatrolDistance)
+        if (ShouldChasePlayer())
         {
-            // Двигаем врага к игроку
-            transform.position = Vector3.MoveTowards(transform.position, patrolIntoPlayer.transform.position, enemySpeed * Time.deltaTime);
+            ChasePlayer();
         }
         else
         {
-            // Двигаем врага к текущей точке патруля
-            transform.position = Vector3.MoveTowards(transform.position, targetPoint.position, enemySpeed * Time.deltaTime);
+            Patrol();
+        }
+    }
 
-            // Проверяем, достиг ли враг точки патруля (используем квадрат расстояния для оптимизации)
-            if ((transform.position - targetPoint.position).sqrMagnitude < 0.05f * 0.05f) 
+    void CheckForPlayer()
+    {
+        Collider[] colliders = Physics.OverlapSphere(
+            transform.position, 
+            enemyPatrolDistance, 
+            playerLayerMask
+        );
+
+        foreach (Collider collider in colliders)
+        {
+            if (collider.CompareTag("Player"))
             {
-                // Переход к следующей точке патруля
-                currentPointIndex = (currentPointIndex + 1) % patrolPoints.Length;
+                patrolIntoPlayer = collider.gameObject;
+                return;
             }
+        }
+        patrolIntoPlayer = null;
+    }
+
+    bool ShouldChasePlayer()
+    {
+        return patrolIntoPlayer != null 
+            && Vector3.Distance(transform.position, patrolIntoPlayer.transform.position) <= enemyPatrolDistance;
+    }
+
+    void ChasePlayer()
+    {
+        Vector3 targetPosition = patrolIntoPlayer.transform.position;
+        targetPosition.y = transform.position.y; // Фиксируем Y, чтобы враг не поднимался и не опускался
+
+        Vector3 direction = (targetPosition - transform.position).normalized;
+        rb.velocity = direction * enemySpeed; // Двигаем врага через физику
+
+        LookAtTarget(targetPosition);
+    }
+
+    void Patrol()
+    {
+        Transform targetPoint = patrolPoints[currentPointIndex];
+        Vector3 targetPosition = targetPoint.position;
+        targetPosition.y = transform.position.y; // Оставляем текущую высоту
+
+        Vector3 direction = (targetPosition - transform.position).normalized;
+        rb.velocity = direction * enemySpeed; // Двигаем врага через физику
+
+        LookAtTarget(targetPosition);
+
+        if (Vector3.Distance(transform.position, targetPoint.position) < 0.5f)
+        {
+            currentPointIndex = (currentPointIndex + 1) % patrolPoints.Length;
+        }
+    }
+
+    void LookAtTarget(Vector3 targetPosition)
+    {
+        Vector3 direction = targetPosition - transform.position;
+        direction.y = 0; // Убираем наклон по оси Y
+
+        if (direction != Vector3.zero)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
         }
     }
 }
