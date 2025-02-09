@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class RecoilController : MonoBehaviour
+using Photon.Pun;
+using Photon.Realtime;
+public class RecoilController : MonoBehaviourPunCallbacks
 {
     [SerializeField] private Transform cameraTransform; // Камера игрока
     [SerializeField] public PlayerController pc;
@@ -11,7 +12,6 @@ public class RecoilController : MonoBehaviour
 
     private Vector3 currentRecoil; // Текущая накопленная отдача
     private Vector3 targetRecoil;  // Желаемая отдача
-
 
     private void Update()
     {

@@ -400,6 +400,7 @@ GameObject:
   - component: {fileID: 3169333266571919284}
   - component: {fileID: 435029097289605977}
   - component: {fileID: 1731076851581841567}
+  - component: {fileID: 2112246195031070305}
   m_Layer: 6
   m_Name: FirstWeapon
   m_TagString: Untagged
@@ -507,7 +508,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 0.524
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -547,6 +548,29 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &2112246195031070305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7212649767461600285}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 2
+  OwnershipTransfer: 0
+  observableSearch: 0
+  ObservedComponents:
+  - {fileID: 435029097289605977}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &8317252377379435518
 GameObject:
   m_ObjectHideFlags: 0
@@ -559,6 +583,7 @@ GameObject:
   - component: {fileID: 7172390170940926881}
   - component: {fileID: 5893479775949764306}
   - component: {fileID: 3467498834836767249}
+  - component: {fileID: 4077280957103169440}
   m_Layer: 6
   m_Name: SecondWeapon
   m_TagString: Untagged
@@ -666,7 +691,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 0.482
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -706,6 +731,29 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &4077280957103169440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8317252377379435518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 0
+  ObservedComponents:
+  - {fileID: 5893479775949764306}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &8926392192150517606
 GameObject:
   m_ObjectHideFlags: 0
