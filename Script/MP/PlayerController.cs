@@ -113,7 +113,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         {
             playerManager.Die();
         }
-        
+
+        pnView.RPC("RPC_UpdateHealth", RpcTarget.All, currentHealth);
+    }
+
+    [PunRPC]
+    void RPC_UpdateHealth(float health)
+    {
+        if (!pnView.IsMine) // Обновляем здоровье на других клиентах
+        {
+            hpBar.value = health;
+        }
     }
     private void Look()
     {
