@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     
 
 
-    [SerializeField] GameObject playerCamera;
+    [SerializeField] public GameObject playerCamera;
     [SerializeField]
     private float
         walkSpeed, sprintSpeed, mouseSensitivity,
@@ -87,8 +87,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         if (Input.GetMouseButtonDown(0))
         {
             items[itemIndex].Use();
-            FirstWeapon.GetComponent<UniversalSoundPlayer>().PlaySound(true);
+            string weaponType = items[itemIndex].weaponType;
+            GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true);
 
+            
+            GetComponent<RecoilController>().ApplyRecoil(weaponType);
         }
     }
     public void TakeDamage(float damage)
