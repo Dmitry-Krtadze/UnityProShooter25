@@ -40,6 +40,7 @@ MonoBehaviour:
   - Fire
   - RespawnSpaceship
   - RPC_Damage
+  - RPC_PlaySound
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
