@@ -34,6 +34,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     private PlayerManager playerManager;
     private bool isCursorLocked = true;
     [SerializeField]  GameObject FirstWeapon;
+
+
+
     private void Awake()
     {
         pnView = GetComponent<PhotonView>();
