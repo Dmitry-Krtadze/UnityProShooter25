@@ -9,29 +9,19 @@ public class RecoilController : MonoBehaviourPunCallbacks
     [SerializeField] public PlayerController pc;
     [SerializeField] private float returnSpeed = 5f;    // Скорость возврата камеры
     [SerializeField] private float maxRecoil = 15f;    // Ограничение отдачи
-    private PhotonView pnView;
+
     private Vector3 currentRecoil; // Текущая накопленная отдача
     private Vector3 targetRecoil;  // Желаемая отдача
 
-    private void Awake()
-    {
-        pnView = GetComponent<PhotonView>();
-    }
-
     private void Update()
     {
-        
-        
+        pc = GetComponent<PlayerController>();
+        cameraTransform = pc.playerCamera.GetComponent<Transform>();
         // Плавно возвращаем камеру в исходное положение
         currentRecoil = Vector3.Lerp(currentRecoil, Vector3.zero, returnSpeed * Time.deltaTime);
-        if (pnView.IsMine)
-        {
-            pc = GetComponent<PlayerController>();
-            cameraTransform = pc.playerCamera.GetComponent<Transform>();
-            cameraTransform.localEulerAngles -= currentRecoil;
-        }
+
         // Применяем отдачу только по вертикали и горизонтали
-        
+        cameraTransform.localEulerAngles -= currentRecoil;
     }
 
     public void ApplyRecoil(string weaponType)
