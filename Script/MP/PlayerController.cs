@@ -32,6 +32,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     private float currentHealth;
     private PlayerManager playerManager;
     private bool isCursorLocked = true;
+    [SerializeField]  GameObject FirstWeapon;
     private void Awake()
     {
         pnView = GetComponent<PhotonView>();
@@ -40,6 +41,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         currentHealth = maxHealth;
         playerManager = PhotonView.Find((int)pnView.InstantiationData[0]).
             GetComponent<PlayerManager>();
+        
+
     }
     private void Start()
     {
@@ -84,6 +87,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         if (Input.GetMouseButtonDown(0))
         {
             items[itemIndex].Use();
+            FirstWeapon.GetComponent<UniversalSoundPlayer>().PlaySound(true);
+
         }
     }
     public void TakeDamage(float damage)
