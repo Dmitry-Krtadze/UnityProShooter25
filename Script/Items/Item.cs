@@ -8,5 +8,11 @@ public abstract class Item : MonoBehaviour
     public GameObject itemGameObject;
     public string weaponType;
 
+    [SerializeField] public int maxAmmo;
+    [SerializeField] public int currentAmmo;
+    [SerializeField] public int reserveAmmo;
+    [SerializeField] public float reloadTime;
+    public bool isReloading;
+
     public abstract void Use();
 }

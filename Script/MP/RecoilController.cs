@@ -6,6 +6,7 @@ using Photon.Realtime;
 public class RecoilController : MonoBehaviourPunCallbacks
 {
     [SerializeField] private Transform cameraTransform; // Камера игрока
+    [SerializeField] private Transform weapon;
     [SerializeField] public PlayerController pc;
     [SerializeField] private float returnSpeed = 5f;    // Скорость возврата камеры
     [SerializeField] private float maxRecoil = 15f;    // Ограничение отдачи
@@ -17,6 +18,7 @@ public class RecoilController : MonoBehaviourPunCallbacks
     private void Awake()
     {
         photonView = GetComponent<PhotonView>();
+        weapon = GetComponent<Transform>();
     }
     private void Update()
     {
@@ -27,7 +29,7 @@ public class RecoilController : MonoBehaviourPunCallbacks
             cameraTransform = pc.playerCamera.GetComponent<Transform>();
             // Плавно возвращаем камеру в исходное положение
             currentRecoil = Vector3.Lerp(currentRecoil, Vector3.zero, returnSpeed * Time.deltaTime);
-
+            weapon.rotation = Quaternion.Lerp(currentRecoil, Vector3.zero, returnSpeed * Time.deltaTime);
             // Применяем отдачу только по вертикали и горизонтали
             cameraTransform.localEulerAngles -= currentRecoil;
         }

@@ -42,6 +42,7 @@ MonoBehaviour:
   - RPC_Damage
   - RPC_PlaySound
   - RPC_UpdateHealth
+  - RPC_SyncWeapon
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

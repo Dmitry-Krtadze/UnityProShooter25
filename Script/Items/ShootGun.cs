@@ -12,13 +12,24 @@ public class ShootGun : Gun
 
     private void Shoot()
     {
-        Ray ray = myCam.ViewportPointToRay(new Vector3(
-            0.5f, 0.5f));
-        ray.origin = myCam.transform.position;
-        if(Physics.Raycast(ray, out RaycastHit hit))
+        GunInfo gunInfo = (GunInfo)itemInfo;
+        if (gunInfo.isReloading) return;
+
+        if (gunInfo.currentAmmo > 0)
         {
-            hit.collider.gameObject.GetComponent<IDamageble>()?.
-                TakeDamage(((GunInfo)itemInfo).Damage);
+            gunInfo.currentAmmo--;
+            Ray ray = myCam.ViewportPointToRay(new Vector3(0.5f, 0.5f));
+            ray.origin = myCam.transform.position;
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                hit.collider.gameObject.GetComponent<IDamageble>()?.
+                    TakeDamage(gunInfo.Damage);
+            }
+        }
+        else
+        {
+            // Звук пустого магазина (если нужно)
         }
     }
+
 }
