@@ -2083,6 +2083,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2813288299697732731, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
+      propertyPath: spawnPoints.Array.size
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 8259772742878324155, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
       propertyPath: m_Name
       value: SpawnerManager
