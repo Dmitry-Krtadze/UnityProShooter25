@@ -15,4 +15,10 @@ public abstract class Item : MonoBehaviour
     public bool isReloading;
 
     public abstract void Use();
+
+    public void AddAmmo(int amount)
+    {
+        reserveAmmo += amount;
+        Debug.Log($"Ammo: {reserveAmmo}");
+    }
 }

@@ -46,6 +46,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     public AudioClip[,] weaponSounds = new AudioClip[2, 3]; // [Оружие, Тип звука]
 
 
+    [SerializeField] private GameObject ShieldObj;
+
     private void Awake()
     {
         pnView = GetComponent<PhotonView>();
@@ -92,24 +94,26 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
  
 
     }
-    private IEnumerator Reload(Item currentItem)
+
+
+
+
+    private float reloadStartTime = 0f;
+    private bool isReloading = false;
+    private Item currentItem;
+
+    private void StartReload(Item item)
     {
+        if (isReloading)
+            return;
 
-        currentItem.isReloading = true;
+        currentItem = item;
+        isReloading = true;
 
+        // Играем звук перезарядки
         GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, weaponSounds[itemIndex, 2]);
 
-        yield return new WaitForSeconds(currentItem.reloadTime);
-        
-        int ammoNeeded = currentItem.maxAmmo - currentItem.currentAmmo;
-        int ammoToLoad = Mathf.Min(ammoNeeded, currentItem.reserveAmmo);
-
-        currentItem.currentAmmo += ammoToLoad;
-        currentItem.reserveAmmo -= ammoToLoad;
-
-        
-        currentItem.isReloading = false;
-        UpdateAmmoUI();
+        reloadStartTime = Time.time;
     }
 
 
@@ -118,13 +122,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         if (!pnView.IsMine)
         {
             return;
+
         }
         Look();
         Movement();
         Jump();
         SelectWeapon();
-        UseItem();
-
+        if (!isReloading) { 
+            UseItem();
+        }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             // Переключаем состояние курсора
@@ -137,6 +143,26 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         }
         hpBar.value = currentHealth;
         hpBarPlayer.value = currentHealth;
+
+
+        if (isReloading)
+        {
+            // Проверяем, прошло ли время для завершения перезарядки
+            if (Time.time >= reloadStartTime + currentItem.reloadTime)
+            {
+                // Завершаем перезарядку
+                int ammoNeeded = currentItem.maxAmmo - currentItem.currentAmmo;
+                int ammoToLoad = Mathf.Min(ammoNeeded, currentItem.reserveAmmo);
+
+                currentItem.currentAmmo += ammoToLoad;
+                currentItem.reserveAmmo -= ammoToLoad;
+
+                isReloading = false;
+
+                // Обновляем UI
+                UpdateAmmoUI();
+            }
+        }
     }
     private void UseItem()
     {
@@ -145,7 +171,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
         if (Input.GetMouseButtonDown(0))
         {
-            if (currentItem.currentAmmo > 0)
+            if (currentItem.currentAmmo > 0 )
             {
                 items[itemIndex].Use();
                 currentItem.currentAmmo--;
@@ -158,6 +184,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
                 GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, weaponSounds[itemIndex, 0]);
 
                 UpdateAmmoUI();
+                GetComponentInChildren<WeaponKickback>().ApplyRecoil(weaponType);
             }
             else
             {
@@ -168,7 +195,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
         if (Input.GetKeyDown(KeyCode.R) && currentItem.currentAmmo < currentItem.maxAmmo && currentItem.reserveAmmo > 0)
         {
-            StartCoroutine(Reload(currentItem));
+            StartReload(currentItem);
         }
     }
 
@@ -216,22 +243,49 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     }
     private void Movement()
     {
+        // Получаем направление движения
         Vector3 moveDir = new Vector3(
-            Input.GetAxisRaw("Horizontal"), 0,
+            Input.GetAxisRaw("Horizontal"),
+            0,
             Input.GetAxisRaw("Vertical")).normalized;
-        moveAmout = Vector3.SmoothDamp(moveAmout, moveDir *
-            (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed :
-            walkSpeed), ref smothMove, smoothTime);
+
+        // Проверяем, есть ли активный ввод
+        if (moveDir != Vector3.zero)
+        {
+            // Если есть ввод, рассчитываем скорость
+            float targetSpeed = (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed);
+            Vector3 targetVelocity = transform.TransformDirection(moveDir) * targetSpeed;
+
+            // Плавное изменение скорости
+            moveAmout = Vector3.Lerp(moveAmout, targetVelocity, smoothTime * Time.deltaTime);
+
+            // Останавливаем корутину на случай, если снова пошёл ввод
+            StopAllCoroutines();
+        }
+        else
+        {
+            // Если ввода нет, запускаем корутину на обнуление скорости
+            if (moveAmout != Vector3.zero)
+            {
+                StartCoroutine(ResetSpeed());
+            }
+        }
     }
+
+    private IEnumerator ResetSpeed()
+    {
+        yield return new WaitForSeconds(0.2f);
+        moveAmout = Vector3.zero;
+    }
+
     private void FixedUpdate()
     {
-        if (!pnView.IsMine)
-        {
-            return;
-        }
-        rb.MovePosition(rb.position + transform.TransformDirection(
-            moveAmout) * Time.fixedDeltaTime);
+        if (!pnView.IsMine) return;
+
+        // Обновляем позицию с использованием moveAmout
+        rb.MovePosition(rb.position + moveAmout * Time.fixedDeltaTime);
     }
+
 
     private void Jump()
     {
@@ -321,5 +375,52 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         Item currentItem = items[itemIndex];
         ammoText.text = currentItem.currentAmmo + " / " + currentItem.reserveAmmo;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+    public void AddHealth(int amount)
+    {
+        currentHealth += amount;
+        currentHealth = Mathf.Clamp(currentHealth, 0, 100); // Максимум 100 здоровья
+        Debug.Log($"Health: {currentHealth}");
+    }
+
+    public bool shieldActive = false;
+
+    public void ActivateShield()
+    {
+        if (!shieldActive)
+        {
+            shieldActive = true;
+            ShieldObj.SetActive(true);
+            Debug.Log("Shield Activated");
+
+            // Отключение щита через 10 секунд
+            Invoke(nameof(DeactivateShield), 10f);
+        }
+    }
+
+    private void DeactivateShield()
+    {
+        shieldActive = false;
+        ShieldObj.SetActive(false);
+        Debug.Log("Shield Deactivated");
+    }
+
+
+
+
+
+
+
 
 }
