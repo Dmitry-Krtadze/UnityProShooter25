@@ -31,40 +31,88 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     [SerializeField] private float maxHealth = 100f;
     [SerializeField] private float currentHealth;
     [SerializeField] Slider hpBar;
+    [SerializeField] private Slider hpBarPlayer;
     private PlayerManager playerManager;
     private bool isCursorLocked = true;
     [SerializeField]  GameObject FirstWeapon;
 
 
 
+
+    [SerializeField] private Text ammoText;
+
+
+
+    public AudioClip[,] weaponSounds = new AudioClip[2, 3]; // [Оружие, Тип звука]
+
+
     private void Awake()
     {
         pnView = GetComponent<PhotonView>();
         rb = GetComponent<Rigidbody>();
-
+        
         currentHealth = maxHealth;
         hpBar.maxValue = maxHealth;
         hpBar.value = currentHealth;
 
-        playerManager = PhotonView.Find((int)pnView.InstantiationData[0]).
-            GetComponent<PlayerManager>();
-        
+        playerManager = PhotonView.Find((int)pnView.InstantiationData[0])
+            .GetComponent<PlayerManager>();
 
+        ammoText = GetComponentInChildren<Text>();
+        hpBarPlayer = GameObject.FindGameObjectWithTag("hpBarPlayer").GetComponent<Slider>();
+
+
+        // Загрузка звуков для оружий
+        weaponSounds[0, 0] = Resources.Load<AudioClip>("Sounds/PistolShoot");
+        weaponSounds[0, 1] = Resources.Load<AudioClip>("Sounds/PistolEmpty");
+        weaponSounds[0, 2] = Resources.Load<AudioClip>("Sounds/PistolReload");
+
+        weaponSounds[1, 0] = Resources.Load<AudioClip>("Sounds/AutoShoot");
+        weaponSounds[1, 1] = Resources.Load<AudioClip>("Sounds/AutoEmpty");
+        weaponSounds[1, 2] = Resources.Load<AudioClip>("Sounds/AutoReload");
     }
+
+
+
     private void Start()
     {
         if (!pnView.IsMine)
         {
             Destroy(playerCamera);
             Destroy(rb);
+            Destroy(ammoText);
         }
         else
         {
             EquipItem(0);
+            UpdateAmmoUI();
         }
 
         LockCursor();
+ 
+
     }
+    private IEnumerator Reload(Item currentItem)
+    {
+
+        currentItem.isReloading = true;
+
+        GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, weaponSounds[itemIndex, 2]);
+
+        yield return new WaitForSeconds(currentItem.reloadTime);
+        
+        int ammoNeeded = currentItem.maxAmmo - currentItem.currentAmmo;
+        int ammoToLoad = Mathf.Min(ammoNeeded, currentItem.reserveAmmo);
+
+        currentItem.currentAmmo += ammoToLoad;
+        currentItem.reserveAmmo -= ammoToLoad;
+
+        
+        currentItem.isReloading = false;
+        UpdateAmmoUI();
+    }
+
+
     private void Update()
     {
         if (!pnView.IsMine)
@@ -88,22 +136,46 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
                 UnlockCursor();
         }
         hpBar.value = currentHealth;
+        hpBarPlayer.value = currentHealth;
     }
     private void UseItem()
     {
+        Item currentItem = items[itemIndex];
+        if (currentItem.isReloading) return;
+
         if (Input.GetMouseButtonDown(0))
         {
-            items[itemIndex].Use();
-            string weaponType = items[itemIndex].weaponType;
-            GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true);
+            if (currentItem.currentAmmo > 0)
+            {
+                items[itemIndex].Use();
+                currentItem.currentAmmo--;
+                currentItem = items[itemIndex]; // Обновление состояния
+                string weaponType = currentItem.weaponType;
 
-            
-            GetComponent<RecoilController>().ApplyRecoil(weaponType);
+                GetComponent<RecoilController>().ApplyRecoil(weaponType);
+
+                // Передаём имя звука для выстрела
+                GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, weaponSounds[itemIndex, 0]);
+
+                UpdateAmmoUI();
+            }
+            else
+            {
+                // Передаём имя звука для пустого магазина
+                GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, weaponSounds[itemIndex, 1]);
+            }
         }
-        
+
+        if (Input.GetKeyDown(KeyCode.R) && currentItem.currentAmmo < currentItem.maxAmmo && currentItem.reserveAmmo > 0)
+        {
+            StartCoroutine(Reload(currentItem));
+        }
     }
 
-    
+
+
+
+
     public void TakeDamage(float damage)
     {
         pnView.RPC("RPC_Damage", RpcTarget.All, damage);
@@ -192,20 +264,27 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         itemIndex = index;
         items[itemIndex].itemGameObject.SetActive(true);
 
-        if(prevItemIndex != -1)
+        if (prevItemIndex != -1)
         {
             items[prevItemIndex].itemGameObject.SetActive(false);
         }
         prevItemIndex = itemIndex;
 
+ 
         if (pnView.IsMine)
         {
             Hashtable hash = new Hashtable();
             hash.Add("index", itemIndex);
             PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
+            UpdateAmmoUI();
         }
         pnView.RPC("RPC_SyncWeapon", RpcTarget.All, itemIndex);
     }
+
+
+
+
+
     [PunRPC]
     void RPC_SyncWeapon(int index)
     {
@@ -234,4 +313,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         Cursor.lockState = CursorLockMode.None;  // Снимаем блокировку курсора
         Cursor.visible = true;                   // Делаем курсор видимым
     }
+
+
+    private void UpdateAmmoUI()
+    {
+        if (!pnView.IsMine) return;
+        Item currentItem = items[itemIndex];
+        ammoText.text = currentItem.currentAmmo + " / " + currentItem.reserveAmmo;
+    }
+
 }
