@@ -29,7 +29,7 @@ public class RecoilController : MonoBehaviourPunCallbacks
             cameraTransform = pc.playerCamera.GetComponent<Transform>();
             // Плавно возвращаем камеру в исходное положение
             currentRecoil = Vector3.Lerp(currentRecoil, Vector3.zero, returnSpeed * Time.deltaTime);
-            weapon.rotation = Quaternion.Lerp(currentRecoil, Vector3.zero, returnSpeed * Time.deltaTime);
+            // weapon.rotation = Quaternion.Lerp(currentRecoil, Vector3.zero, returnSpeed * Time.deltaTime);
             // Применяем отдачу только по вертикали и горизонтали
             cameraTransform.localEulerAngles -= currentRecoil;
         }
