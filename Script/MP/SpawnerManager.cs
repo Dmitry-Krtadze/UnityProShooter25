@@ -2,9 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Gun : Item
+public class SpawnerManager : MonoBehaviour
 {
-
-
-    public abstract override void Use();
+    public Transform[] spawnPoints;
 }

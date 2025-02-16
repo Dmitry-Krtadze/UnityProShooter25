@@ -14,3 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: RIfle
   Damage: 30
+  maxAmmo: 30
+  currentAmmo: 30
+  reserveAmmo: 30
+  reloadTime: 3
+  isReloading: 0

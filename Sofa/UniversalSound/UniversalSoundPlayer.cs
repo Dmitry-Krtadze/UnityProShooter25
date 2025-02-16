@@ -22,42 +22,57 @@ public class UniversalSoundPlayer : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
-    public void PlaySound(bool sync)
+    public void PlaySound(bool sync, AudioClip clip)
     {
+        if (clip == null)
+        {
+            Debug.LogError("[UniversalSoundPlayer] Передан пустой AudioClip!");
+            return;
+        }
+
         Debug.Log($"[UniversalSoundPlayer] PlaySound вызван. Sync: {sync}, IsMine: {photonView.IsMine}");
 
-        if (sync && photonView != null && photonView.IsMine)
+        if (sync && photonView.IsMine)
         {
-            photonView.RPC("RPC_PlaySound", RpcTarget.All);
+            string clipName = clip.name;
+            photonView.RPC("RPC_PlaySound", RpcTarget.All, clipName);
         }
         else
         {
-            PlayLocalSound();
+            PlayLocalSound(clip);
         }
     }
 
-    private void PlayLocalSound()
+    private void PlayLocalSound(AudioClip clip)
     {
         if (audioSource != null)
         {
+            audioSource.clip = clip;
             audioSource.Play();
         }
         else
         {
-            Debug.LogError("[UniversalSoundPlayer] Попытка воспроизвести звук, но AudioSource == null!", gameObject);
+            Debug.LogError("[UniversalSoundPlayer] AudioSource == null!", gameObject);
         }
     }
 
     [PunRPC]
-    private void RPC_PlaySound()
+    private void RPC_PlaySound(string clipName)
     {
-        Debug.Log($"[UniversalSoundPlayer] RPC_PlaySound вызван на {PhotonNetwork.NickName}");
-        PlayLocalSound();
+        Debug.Log($"[UniversalSoundPlayer] RPC_PlaySound вызван с {clipName}");
+        AudioClip clip = Resources.Load<AudioClip>($"Sounds/{clipName}");
+        if (clip != null)
+        {
+            PlayLocalSound(clip);
+        }
+        else
+        {
+            Debug.LogError($"[UniversalSoundPlayer] Клип '{clipName}' не найден в Resources/Sounds!");
+        }
     }
 
-    // Интерфейс IPunObservable нужен для корректной работы с PhotonView
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        // Здесь ничего не передаем, так как звук вызывается через RPC
+        // Ничего не передаем, так как звук вызывается через RPC
     }
 }
