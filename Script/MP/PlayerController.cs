@@ -33,7 +33,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     [SerializeField] private float currentHealth;
     //хпЅар сверху игрока
     [SerializeField] Slider hpBar;
-    [SerializeField] private Text hpBarPlayer;
+    
 
 
     private PlayerManager playerManager;
@@ -43,7 +43,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
 
 
-    [SerializeField] private Text ammoText;
+    [SerializeField] public Text ammoText;
+    [SerializeField] public Text hpBarPlayer;
+
     private float reloadStartTime = 0f;
     private bool isReloading = false;
     private Item currentItem;
@@ -78,11 +80,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             .GetComponent<PlayerManager>();
 
 
-        ammoText = GameObject.FindGameObjectWithTag("ammoText").GetComponent<Text>();
-
-
-        hpBarPlayer = GameObject.FindGameObjectWithTag("hpBarPlayer").GetComponent<Text>();
-
 
     }
 
@@ -90,34 +87,44 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
     private void Start()
     {
+      
+
         if (!pnView.IsMine)
         {
             Destroy(playerCamera);
-            Destroy(rb);
-            Destroy(ammoText);
-            Destroy(hpBarPlayer);
+            rb.isKinematic = true; // ќтключаем физику вместо удалени€ Rigidbody
+
+            // ƒеактивируем UI
+            if (ammoText != null) ammoText.gameObject.SetActive(false);
+            if (hpBarPlayer != null) hpBarPlayer.gameObject.SetActive(false);
         }
         else
         {
-            hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
+            playerCamera.SetActive(true);
+            // јктивируем UI только дл€ локального игрока
+            if (ammoText != null)
+            {
+                ammoText.gameObject.SetActive(true);
+                UpdateAmmoUI();
+            }
+            if (hpBarPlayer != null)
+            {
+                hpBarPlayer.gameObject.SetActive(true);
+                hpBarPlayer.text = $"HP {currentHealth}/100";
+            }
             EquipItem(0);
             UpdateAmmoUI();
-            LeaderboardUI = GetComponentInChildren<LeaderboardUI>();
-
-  
-
-           
         }
-        
+
         LockCursor();
         LeaderBoardManager = GameObject.FindGameObjectWithTag("LeaderBoardManager").GetComponent<LeaderBoardManager>();
-    
         LeaderBoardManager.UpdateLeaderboard(PhotonNetwork.NickName, 0, 0, 0);
-    }   
+    }
 
-    
 
-    
+
+
+
     private void StartReload(Item item)
     {
         if (isReloading)

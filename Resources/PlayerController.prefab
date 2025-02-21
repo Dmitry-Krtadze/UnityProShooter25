@@ -1847,9 +1847,9 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 0
   hpBar: {fileID: 6398100829492312029}
-  hpBarPlayer: {fileID: 659172332344536861}
   FirstWeapon: {fileID: 7212649767461600285}
   ammoText: {fileID: 3931811105780395789}
+  hpBarPlayer: {fileID: 659172332344536861}
   ShieldObj: {fileID: 345437861029795403}
   shieldActive: 0
 --- !u!114 &4529711545312793024

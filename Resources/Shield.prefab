@@ -17,8 +17,8 @@ GameObject:
   - component: {fileID: 319606944832797152}
   - component: {fileID: 319606944832797155}
   m_Layer: 0
-  m_Name: AmmoKit
-  m_TagString: AmmoKit
+  m_Name: Shield
+  m_TagString: HealthKit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 0e7159b7e3983b142baea0a7a3f3a001, type: 2}
+  - {fileID: 2100000, guid: 5e2f5efa9e7155d4195d28fdc989ac4d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -163,5 +163,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de3878b12b81dda4992204f133157b5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemType: 1
-  value: 20
+  itemType: 2
+  value: 0

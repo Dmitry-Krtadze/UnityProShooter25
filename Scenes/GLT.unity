@@ -1757,11 +1757,11 @@ PrefabInstance:
     - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
       propertyPath: objectsToSpawn.Array.data[1]
       value: 
-      objectReference: {fileID: 7902996808280436990, guid: 1618cdb8d89f1404c90e05ea85959b4c, type: 3}
+      objectReference: {fileID: 319606944832797154, guid: d80369f814ea846439356d6a6caf97d0, type: 3}
     - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
       propertyPath: objectsToSpawn.Array.data[2]
       value: 
-      objectReference: {fileID: 4664846439173410716, guid: 07d85dfc110640945999a3f5d847d91c, type: 3}
+      objectReference: {fileID: 319606944832797154, guid: 36af3c476a391d94b8b0e9a606a32454, type: 3}
     - target: {fileID: 8259772742878324155, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
       propertyPath: m_Name
       value: SpawnerManager
@@ -7445,6 +7445,10 @@ PrefabInstance:
     - target: {fileID: 1867963878118189106, guid: 66f816f3e78d0624c8e206359a8f3bf1, type: 3}
       propertyPath: m_Name
       value: LeaderBoardManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 5765272358039785079, guid: 66f816f3e78d0624c8e206359a8f3bf1, type: 3}
+      propertyPath: sceneViewId
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6197400729124213948, guid: 66f816f3e78d0624c8e206359a8f3bf1, type: 3}
       propertyPath: m_RootOrder
