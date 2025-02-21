@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
     
 
-
+    //Переменные для перемещения, камеры
     [SerializeField] public GameObject playerCamera;
     [SerializeField]
     private float
@@ -23,15 +23,19 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     private Rigidbody rb;
     private PhotonView pnView;
 
+    //Масив для оружия
     [SerializeField] Item[] items;
     private int itemIndex;
     private int prevItemIndex = -1;
 
-
+    //Переменные для хп
     [SerializeField] private float maxHealth = 100f;
     [SerializeField] private float currentHealth;
+    //хпБар сверху игрока
     [SerializeField] Slider hpBar;
     [SerializeField] private Slider hpBarPlayer;
+
+
     private PlayerManager playerManager;
     private bool isCursorLocked = true;
     [SerializeField]  GameObject FirstWeapon;
@@ -43,13 +47,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
 
 
-    public AudioClip[,] weaponSounds = new AudioClip[2, 3]; // [Оружие, Тип звука]
-
 
     [SerializeField] private GameObject ShieldObj;
 
+
+    SoundGodScript soundGod;
+
+
+
     private void Awake()
     {
+        soundGod = FindObjectOfType<SoundGodScript>();  
+
         pnView = GetComponent<PhotonView>();
         rb = GetComponent<Rigidbody>();
         
@@ -64,14 +73,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         hpBarPlayer = GameObject.FindGameObjectWithTag("hpBarPlayer").GetComponent<Slider>();
 
 
-        // Загрузка звуков для оружий
-        weaponSounds[0, 0] = Resources.Load<AudioClip>("Sounds/PistolShoot");
-        weaponSounds[0, 1] = Resources.Load<AudioClip>("Sounds/PistolEmpty");
-        weaponSounds[0, 2] = Resources.Load<AudioClip>("Sounds/PistolReload");
-
-        weaponSounds[1, 0] = Resources.Load<AudioClip>("Sounds/AutoShoot");
-        weaponSounds[1, 1] = Resources.Load<AudioClip>("Sounds/AutoEmpty");
-        weaponSounds[1, 2] = Resources.Load<AudioClip>("Sounds/AutoReload");
     }
 
 
@@ -88,12 +89,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         {
             EquipItem(0);
             UpdateAmmoUI();
+           
+            
         }
 
         LockCursor();
- 
 
-    }
+        
+    }   
 
 
 
@@ -110,8 +113,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         currentItem = item;
         isReloading = true;
 
-        // Играем звук перезарядки
-        GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, weaponSounds[itemIndex, 2]);
+        if (currentItem.weaponType == "Pistol")
+        {
+            GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "PistolReload"));
+        } else if (currentItem.weaponType == "AK47")
+        {
+            GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "AutoReload"));
+        }
+        
 
         reloadStartTime = Time.time;
     }
@@ -144,13 +153,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         hpBar.value = currentHealth;
         hpBarPlayer.value = currentHealth;
 
-
+        if (shieldActive)
+        {
+            ShieldObj.SetActive(true);
+        }
+        else
+        {
+            ShieldObj.SetActive(false);
+        }
         if (isReloading)
         {
-            // Проверяем, прошло ли время для завершения перезарядки
             if (Time.time >= reloadStartTime + currentItem.reloadTime)
             {
-                // Завершаем перезарядку
                 int ammoNeeded = currentItem.maxAmmo - currentItem.currentAmmo;
                 int ammoToLoad = Mathf.Min(ammoNeeded, currentItem.reserveAmmo);
 
@@ -159,7 +173,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
                 isReloading = false;
 
-                // Обновляем UI
                 UpdateAmmoUI();
             }
         }
@@ -181,7 +194,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
                 GetComponent<RecoilController>().ApplyRecoil(weaponType);
 
                 // Передаём имя звука для выстрела
-                GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, weaponSounds[itemIndex, 0]);
+                if (currentItem.weaponType == "Pistol")
+                {
+                    GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "PistolShoot"));
+                }
+                else if (currentItem.weaponType == "AK47")
+                {
+                    GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "AutoShoot"));
+                }
 
                 UpdateAmmoUI();
                 GetComponentInChildren<WeaponKickback>().ApplyRecoil(weaponType);
@@ -189,7 +209,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             else
             {
                 // Передаём имя звука для пустого магазина
-                GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, weaponSounds[itemIndex, 1]);
+                if (currentItem.weaponType == "Pistol")
+                {
+                    GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "PistolEmpty"));
+                }
+                else if (currentItem.weaponType == "AK47")
+                {
+                    GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "AutoEmpty"));
+                };
             }
         }
 
@@ -213,12 +240,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     {
         if (!pnView.IsMine) return;
         currentHealth -= damage;
-        
+
         if (currentHealth <= 0)
         {
             playerManager.Die();
         }
-
         pnView.RPC("RPC_UpdateHealth", RpcTarget.All, currentHealth);
     }
 
@@ -228,6 +254,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         if (!pnView.IsMine) // Обновляем здоровье на других клиентах
         {
             hpBar.value = health;
+            hpBarPlayer.value = health;
+
         }
     }
     private void Look()
@@ -281,8 +309,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     private void FixedUpdate()
     {
         if (!pnView.IsMine) return;
-
-        // Обновляем позицию с использованием moveAmout
         rb.MovePosition(rb.position + moveAmout * Time.fixedDeltaTime);
     }
 
@@ -335,10 +361,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         pnView.RPC("RPC_SyncWeapon", RpcTarget.All, itemIndex);
     }
 
-
-
-
-
     [PunRPC]
     void RPC_SyncWeapon(int index)
     {
@@ -380,13 +402,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
 
 
-
-
-
-
-
-
-
     public void AddHealth(int amount)
     {
         currentHealth += amount;
@@ -401,7 +416,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         if (!shieldActive)
         {
             shieldActive = true;
-            ShieldObj.SetActive(true);
             Debug.Log("Shield Activated");
 
             // Отключение щита через 10 секунд
@@ -412,7 +426,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     private void DeactivateShield()
     {
         shieldActive = false;
-        ShieldObj.SetActive(false);
         Debug.Log("Shield Deactivated");
     }
 
@@ -423,4 +436,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+  
 }

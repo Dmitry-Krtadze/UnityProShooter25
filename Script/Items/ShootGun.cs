@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Photon.Pun;
 public class ShootGun : Gun
 {
     [SerializeField] Camera myCam;
+    PlayerController playerC;
+
     public override void Use()
     {
         Shoot();
