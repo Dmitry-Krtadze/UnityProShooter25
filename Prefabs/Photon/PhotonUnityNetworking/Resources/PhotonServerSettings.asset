@@ -46,6 +46,11 @@ MonoBehaviour:
   - DestroyItem
   - RPC_AddPlayer
   - RPC_UpdatePlayerStats
+  - RPC_UpdateLederBoard
+  - SyncLeaderboard
+  - RequestLeaderboardSync
+  - RequestLeaderboard
+  - UpdatePlayerStats
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

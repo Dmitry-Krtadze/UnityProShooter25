@@ -25,7 +25,7 @@ public class ShootGun : Gun
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
                 hit.collider.gameObject.GetComponent<IDamageble>()?.
-                    TakeDamage(gunInfo.Damage);
+                    TakeDamage(gunInfo.Damage, PhotonNetwork.NickName);
             }
         }
         else

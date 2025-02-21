@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     private Vector3 smothMove;
     private Vector3 moveAmout;
     private Rigidbody rb;
-    private PhotonView pnView;
+    public PhotonView pnView;
 
     //Масив для оружия
     [SerializeField] Item[] items;
@@ -33,7 +33,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     [SerializeField] private float currentHealth;
     //хпБар сверху игрока
     [SerializeField] Slider hpBar;
-    [SerializeField] private Slider hpBarPlayer;
+    [SerializeField] private Text hpBarPlayer;
 
 
     private PlayerManager playerManager;
@@ -44,6 +44,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
 
     [SerializeField] private Text ammoText;
+    private float reloadStartTime = 0f;
+    private bool isReloading = false;
+    private Item currentItem;
 
 
 
@@ -52,6 +55,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
 
     SoundGodScript soundGod;
+
+    LeaderBoardManager LeaderBoardManager;
+    LeaderboardUI LeaderboardUI;
 
 
 
@@ -66,11 +72,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         hpBar.maxValue = maxHealth;
         hpBar.value = currentHealth;
 
+        
+
         playerManager = PhotonView.Find((int)pnView.InstantiationData[0])
             .GetComponent<PlayerManager>();
 
-        ammoText = GetComponentInChildren<Text>();
-        hpBarPlayer = GameObject.FindGameObjectWithTag("hpBarPlayer").GetComponent<Slider>();
+
+        ammoText = GameObject.FindGameObjectWithTag("ammoText").GetComponent<Text>();
+
+
+        hpBarPlayer = GameObject.FindGameObjectWithTag("hpBarPlayer").GetComponent<Text>();
 
 
     }
@@ -84,27 +95,29 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             Destroy(playerCamera);
             Destroy(rb);
             Destroy(ammoText);
+            Destroy(hpBarPlayer);
         }
         else
         {
+            hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
             EquipItem(0);
             UpdateAmmoUI();
+            LeaderboardUI = GetComponentInChildren<LeaderboardUI>();
+
+  
+
            
-            
         }
-
-        LockCursor();
-
         
+        LockCursor();
+        LeaderBoardManager = GameObject.FindGameObjectWithTag("LeaderBoardManager").GetComponent<LeaderBoardManager>();
+    
+        LeaderBoardManager.UpdateLeaderboard(PhotonNetwork.NickName, 0, 0, 0);
     }   
 
+    
 
-
-
-    private float reloadStartTime = 0f;
-    private bool isReloading = false;
-    private Item currentItem;
-
+    
     private void StartReload(Item item)
     {
         if (isReloading)
@@ -151,7 +164,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
                 UnlockCursor();
         }
         hpBar.value = currentHealth;
-        hpBarPlayer.value = currentHealth;
+
+
+        hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
+
+
+
 
         if (shieldActive)
         {
@@ -179,6 +197,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     }
     private void UseItem()
     {
+        
         Item currentItem = items[itemIndex];
         if (currentItem.isReloading) return;
 
@@ -186,6 +205,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         {
             if (currentItem.currentAmmo > 0 )
             {
+                LeaderBoardManager.UpdateLeaderboard(PhotonNetwork.NickName, 0, 0, 1);
+                LeaderBoardManager.PlayerStats stats = LeaderBoardManager.GetPlayerStats(PhotonNetwork.NickName);
+                Debug.Log($"Player {PhotonNetwork.NickName} Stats: Kills = {stats.kills}, Deaths = {stats.deaths}, Score = {stats.score}");
+
                 items[itemIndex].Use();
                 currentItem.currentAmmo--;
                 currentItem = items[itemIndex]; // Обновление состояния
@@ -230,22 +253,24 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
 
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damage, string attacker)
     {
-        pnView.RPC("RPC_Damage", RpcTarget.All, damage);
+        pnView.RPC("RPC_Damage", RpcTarget.Others, damage, attacker);
     }
 
     [PunRPC]
-    void RPC_Damage(float damage)
+    void RPC_Damage(float damage, string attacker)
     {
         if (!pnView.IsMine) return;
         currentHealth -= damage;
-
+        hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
+        Debug.Log(attacker);
         if (currentHealth <= 0)
         {
             playerManager.Die();
         }
         pnView.RPC("RPC_UpdateHealth", RpcTarget.All, currentHealth);
+        
     }
 
     [PunRPC]
@@ -254,7 +279,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         if (!pnView.IsMine) // Обновляем здоровье на других клиентах
         {
             hpBar.value = health;
-            hpBarPlayer.value = health;
+            hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
 
         }
     }
@@ -318,7 +343,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         if(Input.GetKeyDown(KeyCode.Space) && isGround)
         {
             rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
-            Debug.Log("Jump");
+        
         }
         
     }

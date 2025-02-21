@@ -6,7 +6,7 @@ public class UniversalSoundPlayer : MonoBehaviourPunCallbacks, IPunObservable
 {
     private AudioSource audioSource;
     private PhotonView photonView;
-
+    [SerializeField] private bool debugEnable = false;
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
@@ -25,12 +25,12 @@ public class UniversalSoundPlayer : MonoBehaviourPunCallbacks, IPunObservable
     public void PlaySound(bool sync, AudioClip clip)
     {
         if (clip == null)
-        {
+        {   
             Debug.LogError("[UniversalSoundPlayer] Передан пустой AudioClip!");
             return;
         }
 
-        Debug.Log($"[UniversalSoundPlayer] PlaySound вызван. Sync: {sync}, IsMine: {photonView.IsMine}");
+        if (debugEnable) Debug.Log($"[UniversalSoundPlayer] PlaySound вызван. Sync: {sync}, IsMine: {photonView.IsMine}");
 
         if (sync && photonView.IsMine)
         {
@@ -59,7 +59,7 @@ public class UniversalSoundPlayer : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     private void RPC_PlaySound(string clipName)
     {
-        Debug.Log($"[UniversalSoundPlayer] RPC_PlaySound вызван с {clipName}");
+        if (debugEnable)  Debug.Log($"[UniversalSoundPlayer] RPC_PlaySound вызван с {clipName}");
         AudioClip clip = Resources.Load<AudioClip>($"Sounds/{clipName}");
         if (clip != null)
         {

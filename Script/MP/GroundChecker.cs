@@ -14,7 +14,7 @@ public class GroundChecker : MonoBehaviour
         if (other.gameObject == player.gameObject)
             return;
         player.GroundState(true);
-        Debug.Log("Enter");
+
 
     }
     private void OnTriggerExit(Collider other)
@@ -22,6 +22,6 @@ public class GroundChecker : MonoBehaviour
         if (other.gameObject == player.gameObject)
             return;
         player.GroundState(false);
-        Debug.Log("exit");
+
     }
 }
