@@ -307,15 +307,21 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     void RPC_Damage(float damage, string attacker)
     {
         if (!pnView.IsMine) return;
+
         currentHealth -= damage;
         hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
         Debug.Log(attacker);
+
         if (currentHealth <= 0)
         {
+            // Обновляем статистику: жертва получает смерть, а атакующий – убийство
+            LeaderBoardManager.Instance.photonView.RPC("RPC_AddDeath", RpcTarget.MasterClient, PhotonNetwork.NickName);
+            LeaderBoardManager.Instance.photonView.RPC("RPC_AddKill", RpcTarget.MasterClient, attacker);
+
             playerManager.Die();
         }
+
         pnView.RPC("RPC_UpdateHealth", RpcTarget.All, currentHealth);
-        
     }
 
     [PunRPC]
