@@ -63,6 +63,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
 
 
+    [SerializeField] private float bobbingSpeed = 7f; // Скорость пошатывания
+    [SerializeField] private float bobbingAmountY = 0.05f; // Амплитуда пошатывания вверх-вниз
+    [SerializeField] private float bobbingAmountX = 0.03f; // Амплитуда пошатывания влево-вправо
+    [SerializeField] private float sprintMultiplier = 1.8f; // Ускорение при спринте
+    private float defaultCamPosY;
+    private float defaultCamPosX;
+    private float bobbingTimer = 0f;
+    private bool isSprinting => Input.GetKey(KeyCode.LeftShift) && moveAmout.magnitude > 0.1f;
+
+
+
+
     private void Awake()
     {
         soundGod = FindObjectOfType<SoundGodScript>();  
@@ -97,6 +109,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             // Деактивируем UI
             if (ammoText != null) ammoText.gameObject.SetActive(false);
             if (hpBarPlayer != null) hpBarPlayer.gameObject.SetActive(false);
+
         }
         else
         {
@@ -112,16 +125,25 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
                 hpBarPlayer.gameObject.SetActive(true);
                 hpBarPlayer.text = $"HP {currentHealth}/100";
             }
+            if (playerCamera != null)
+            {
+                defaultCamPosY = playerCamera.transform.localPosition.y;
+                defaultCamPosX = playerCamera.transform.localPosition.x;
+            }
             EquipItem(0);
+            
             UpdateAmmoUI();
         }
 
         LockCursor();
         LeaderBoardManager = GameObject.FindGameObjectWithTag("LeaderBoardManager").GetComponent<LeaderBoardManager>();
-        LeaderBoardManager.UpdateLeaderboard(PhotonNetwork.NickName, 0, 0, 0);
+
+
+
+        LeaderBoardManager.Instance.photonView.RPC("RequestLeaderboardFromMaster", RpcTarget.MasterClient);
     }
 
-
+    
 
 
 
@@ -157,6 +179,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         Movement();
         Jump();
         SelectWeapon();
+
         if (!isReloading) { 
             UseItem();
         }
@@ -172,11 +195,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         }
         hpBar.value = currentHealth;
 
-
         hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
-
-
-
 
         if (shieldActive)
         {
@@ -197,24 +216,36 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
                 currentItem.reserveAmmo -= ammoToLoad;
 
                 isReloading = false;
+                currentItem.isReloading = false;
 
                 UpdateAmmoUI();
             }
         }
+        
+        CameraBobbing();
     }
     private void UseItem()
     {
         
         Item currentItem = items[itemIndex];
+        if (isReloading) return;
         if (currentItem.isReloading) return;
 
         if (Input.GetMouseButtonDown(0))
         {
             if (currentItem.currentAmmo > 0 )
             {
-                LeaderBoardManager.UpdateLeaderboard(PhotonNetwork.NickName, 0, 0, 1);
-                LeaderBoardManager.PlayerStats stats = LeaderBoardManager.GetPlayerStats(PhotonNetwork.NickName);
-                Debug.Log($"Player {PhotonNetwork.NickName} Stats: Kills = {stats.kills}, Deaths = {stats.deaths}, Score = {stats.score}");
+                if (!PhotonNetwork.IsMasterClient)
+                {
+                    LeaderBoardManager.Instance.photonView.RPC("RPC_AddScore", RpcTarget.MasterClient, PhotonNetwork.NickName, 1);
+                }
+                else
+                {
+                    LeaderBoardManager.Instance.RPC_AddScore(PhotonNetwork.NickName, 1);
+                }
+
+
+
 
                 items[itemIndex].Use();
                 currentItem.currentAmmo--;
@@ -257,7 +288,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     }
 
 
-
+    [PunRPC]
+    void RPC_AddScore(string playerName, int scoreToAdd)
+    {
+        LeaderBoardManager.PlayerStats currentStats = LeaderBoardManager.GetPlayerStats(playerName);
+        int newScore = currentStats.score + scoreToAdd;
+        LeaderBoardManager.UpdateLeaderboard(playerName, currentStats.kills, currentStats.deaths, newScore);
+        LeaderBoardManager.SyncLeaderboard();
+    }
 
 
     public void TakeDamage(float damage, string attacker)
@@ -320,7 +358,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             moveAmout = Vector3.Lerp(moveAmout, targetVelocity, smoothTime * Time.deltaTime);
 
             // Останавливаем корутину на случай, если снова пошёл ввод
-            StopAllCoroutines();
+            StopCoroutine(ResetSpeed());
         }
         else
         {
@@ -387,6 +425,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         {
             Hashtable hash = new Hashtable();
             hash.Add("index", itemIndex);
+            
             PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
             UpdateAmmoUI();
         }
@@ -464,20 +503,28 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
 
 
+    private void CameraBobbing()
+    {
+        if (moveAmout.magnitude > 0.1f && isGround)
+        {
+            float speed = isSprinting ? bobbingSpeed * sprintMultiplier : bobbingSpeed;
+            float amountY = isSprinting ? bobbingAmountY * sprintMultiplier : bobbingAmountY;
+            float amountX = isSprinting ? bobbingAmountX * sprintMultiplier : bobbingAmountX;
+
+            bobbingTimer += Time.deltaTime * speed;
+            float newY = defaultCamPosY + Mathf.Sin(bobbingTimer) * amountY;
+            float newX = defaultCamPosX + Mathf.Cos(bobbingTimer * 0.5f) * amountX;
+
+            playerCamera.transform.localPosition = new Vector3(newX, newY, playerCamera.transform.localPosition.z);
+        }
+        else
+        {
+            bobbingTimer = 0f;
+            playerCamera.transform.localPosition = new Vector3(defaultCamPosX, defaultCamPosY, playerCamera.transform.localPosition.z);
+        }
+    }
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-  
 }
