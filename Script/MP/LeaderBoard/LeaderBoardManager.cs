@@ -208,7 +208,8 @@ public class LeaderBoardManager : MonoBehaviourPunCallbacks, IPunObservable
         if (PhotonNetwork.IsMasterClient)
         {
             var currentStats = GetPlayerStats(playerName);
-            UpdateLeaderboard(playerName, currentStats.kills + 1, currentStats.deaths, currentStats.score);
+            int newScore = currentStats.score + 30; // Добавляем 30 очков за убийство
+            UpdateLeaderboard(playerName, currentStats.kills + 1, currentStats.deaths, newScore);
             SyncLeaderboard();
         }
     }
@@ -219,7 +220,8 @@ public class LeaderBoardManager : MonoBehaviourPunCallbacks, IPunObservable
         if (PhotonNetwork.IsMasterClient)
         {
             var currentStats = GetPlayerStats(playerName);
-            UpdateLeaderboard(playerName, currentStats.kills, currentStats.deaths + 1, currentStats.score);
+            int newScore = currentStats.score - 10; // Отнимаем 10 очков за смерть
+            UpdateLeaderboard(playerName, currentStats.kills, currentStats.deaths + 1, newScore);
             SyncLeaderboard();
         }
     }
