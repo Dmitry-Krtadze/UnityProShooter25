@@ -106,7 +106,8 @@ public class ConnectionToServer : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         PhotonNetwork.JoinLobby(); // ALLO
-        PhotonNetwork.NickName = "Player" + Random.Range(0, 1000);
+        string randomNickname = "Player" + Random.Range(0, 1000);
+        PhotonNetwork.NickName = PlayerPrefs.GetString("NickName", randomNickname); 
         PhotonNetwork.AutomaticallySyncScene = true;
     }
 

@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
     
 
-
+    //Переменные для перемещения, камеры
     [SerializeField] public GameObject playerCamera;
     [SerializeField]
     private float
@@ -21,17 +21,21 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     private Vector3 smothMove;
     private Vector3 moveAmout;
     private Rigidbody rb;
-    private PhotonView pnView;
+    public PhotonView pnView;
 
+    //Масив для оружия
     [SerializeField] Item[] items;
     private int itemIndex;
     private int prevItemIndex = -1;
 
-
+    //Переменные для хп
     [SerializeField] private float maxHealth = 100f;
     [SerializeField] private float currentHealth;
+    //хпБар сверху игрока
     [SerializeField] Slider hpBar;
-    [SerializeField] private Slider hpBarPlayer;
+    
+
+
     private PlayerManager playerManager;
     private bool isCursorLocked = true;
     [SerializeField]  GameObject FirstWeapon;
@@ -39,17 +43,42 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
 
 
-    [SerializeField] private Text ammoText;
+    [SerializeField] public Text ammoText;
+    [SerializeField] public Text hpBarPlayer;
+
+    private float reloadStartTime = 0f;
+    private bool isReloading = false;
+    private Item currentItem;
 
 
-
-    public AudioClip[,] weaponSounds = new AudioClip[2, 3]; // [Оружие, Тип звука]
 
 
     [SerializeField] private GameObject ShieldObj;
 
+
+    SoundGodScript soundGod;
+
+    LeaderBoardManager LeaderBoardManager;
+    LeaderboardUI LeaderboardUI;
+
+
+
+    [SerializeField] private float bobbingSpeed = 7f; // Скорость пошатывания
+    [SerializeField] private float bobbingAmountY = 0.05f; // Амплитуда пошатывания вверх-вниз
+    [SerializeField] private float bobbingAmountX = 0.03f; // Амплитуда пошатывания влево-вправо
+    [SerializeField] private float sprintMultiplier = 1.8f; // Ускорение при спринте
+    private float defaultCamPosY;
+    private float defaultCamPosX;
+    private float bobbingTimer = 0f;
+    private bool isSprinting => Input.GetKey(KeyCode.LeftShift) && moveAmout.magnitude > 0.1f;
+
+
+
+
     private void Awake()
     {
+        soundGod = FindObjectOfType<SoundGodScript>();  
+
         pnView = GetComponent<PhotonView>();
         rb = GetComponent<Rigidbody>();
         
@@ -57,50 +86,66 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         hpBar.maxValue = maxHealth;
         hpBar.value = currentHealth;
 
+        
+
         playerManager = PhotonView.Find((int)pnView.InstantiationData[0])
             .GetComponent<PlayerManager>();
 
-        ammoText = GetComponentInChildren<Text>();
-        hpBarPlayer = GameObject.FindGameObjectWithTag("hpBarPlayer").GetComponent<Slider>();
 
 
-        // Загрузка звуков для оружий
-        weaponSounds[0, 0] = Resources.Load<AudioClip>("Sounds/PistolShoot");
-        weaponSounds[0, 1] = Resources.Load<AudioClip>("Sounds/PistolEmpty");
-        weaponSounds[0, 2] = Resources.Load<AudioClip>("Sounds/PistolReload");
-
-        weaponSounds[1, 0] = Resources.Load<AudioClip>("Sounds/AutoShoot");
-        weaponSounds[1, 1] = Resources.Load<AudioClip>("Sounds/AutoEmpty");
-        weaponSounds[1, 2] = Resources.Load<AudioClip>("Sounds/AutoReload");
     }
 
 
 
     private void Start()
     {
+      
+
         if (!pnView.IsMine)
         {
             Destroy(playerCamera);
-            Destroy(rb);
-            Destroy(ammoText);
+            rb.isKinematic = true; // Отключаем физику вместо удаления Rigidbody
+
+            // Деактивируем UI
+            if (ammoText != null) ammoText.gameObject.SetActive(false);
+            if (hpBarPlayer != null) hpBarPlayer.gameObject.SetActive(false);
+
         }
         else
         {
+            playerCamera.SetActive(true);
+            // Активируем UI только для локального игрока
+            if (ammoText != null)
+            {
+                ammoText.gameObject.SetActive(true);
+                UpdateAmmoUI();
+            }
+            if (hpBarPlayer != null)
+            {
+                hpBarPlayer.gameObject.SetActive(true);
+                hpBarPlayer.text = $"HP {currentHealth}/100";
+            }
+            if (playerCamera != null)
+            {
+                defaultCamPosY = playerCamera.transform.localPosition.y;
+                defaultCamPosX = playerCamera.transform.localPosition.x;
+            }
             EquipItem(0);
+            
             UpdateAmmoUI();
         }
 
         LockCursor();
- 
+        LeaderBoardManager = GameObject.FindGameObjectWithTag("LeaderBoardManager").GetComponent<LeaderBoardManager>();
 
+
+
+        LeaderBoardManager.Instance.photonView.RPC("RequestLeaderboardFromMaster", RpcTarget.MasterClient);
     }
 
+    
 
 
-
-    private float reloadStartTime = 0f;
-    private bool isReloading = false;
-    private Item currentItem;
 
     private void StartReload(Item item)
     {
@@ -110,8 +155,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         currentItem = item;
         isReloading = true;
 
-        // Играем звук перезарядки
-        GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, weaponSounds[itemIndex, 2]);
+        if (currentItem.weaponType == "Pistol")
+        {
+            GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "PistolReload"));
+        } else if (currentItem.weaponType == "AK47")
+        {
+            GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "AutoReload"));
+        }
+        
 
         reloadStartTime = Time.time;
     }
@@ -128,6 +179,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         Movement();
         Jump();
         SelectWeapon();
+
         if (!isReloading) { 
             UseItem();
         }
@@ -142,15 +194,21 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
                 UnlockCursor();
         }
         hpBar.value = currentHealth;
-        hpBarPlayer.value = currentHealth;
 
+        hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
 
+        if (shieldActive)
+        {
+            ShieldObj.SetActive(true);
+        }
+        else
+        {
+            ShieldObj.SetActive(false);
+        }
         if (isReloading)
         {
-            // Проверяем, прошло ли время для завершения перезарядки
             if (Time.time >= reloadStartTime + currentItem.reloadTime)
             {
-                // Завершаем перезарядку
                 int ammoNeeded = currentItem.maxAmmo - currentItem.currentAmmo;
                 int ammoToLoad = Mathf.Min(ammoNeeded, currentItem.reserveAmmo);
 
@@ -158,21 +216,37 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
                 currentItem.reserveAmmo -= ammoToLoad;
 
                 isReloading = false;
+                currentItem.isReloading = false;
 
-                // Обновляем UI
                 UpdateAmmoUI();
             }
         }
+        
+        CameraBobbing();
     }
     private void UseItem()
     {
+        
         Item currentItem = items[itemIndex];
+        if (isReloading) return;
         if (currentItem.isReloading) return;
 
         if (Input.GetMouseButtonDown(0))
         {
             if (currentItem.currentAmmo > 0 )
             {
+                if (!PhotonNetwork.IsMasterClient)
+                {
+                    LeaderBoardManager.Instance.photonView.RPC("RPC_AddScore", RpcTarget.MasterClient, PhotonNetwork.NickName, 1);
+                }
+                else
+                {
+                    LeaderBoardManager.Instance.RPC_AddScore(PhotonNetwork.NickName, 1);
+                }
+
+
+
+
                 items[itemIndex].Use();
                 currentItem.currentAmmo--;
                 currentItem = items[itemIndex]; // Обновление состояния
@@ -181,7 +255,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
                 GetComponent<RecoilController>().ApplyRecoil(weaponType);
 
                 // Передаём имя звука для выстрела
-                GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, weaponSounds[itemIndex, 0]);
+                if (currentItem.weaponType == "Pistol")
+                {
+                    GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "PistolShoot"));
+                }
+                else if (currentItem.weaponType == "AK47")
+                {
+                    GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "AutoShoot"));
+                }
 
                 UpdateAmmoUI();
                 GetComponentInChildren<WeaponKickback>().ApplyRecoil(weaponType);
@@ -189,7 +270,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             else
             {
                 // Передаём имя звука для пустого магазина
-                GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, weaponSounds[itemIndex, 1]);
+                if (currentItem.weaponType == "Pistol")
+                {
+                    GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "PistolEmpty"));
+                }
+                else if (currentItem.weaponType == "AK47")
+                {
+                    GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "AutoEmpty"));
+                };
             }
         }
 
@@ -200,26 +288,34 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     }
 
 
-
-
-
-    public void TakeDamage(float damage)
+    [PunRPC]
+    void RPC_AddScore(string playerName, int scoreToAdd)
     {
-        pnView.RPC("RPC_Damage", RpcTarget.All, damage);
+        LeaderBoardManager.PlayerStats currentStats = LeaderBoardManager.GetPlayerStats(playerName);
+        int newScore = currentStats.score + scoreToAdd;
+        LeaderBoardManager.UpdateLeaderboard(playerName, currentStats.kills, currentStats.deaths, newScore);
+        LeaderBoardManager.SyncLeaderboard();
+    }
+
+
+    public void TakeDamage(float damage, string attacker)
+    {
+        pnView.RPC("RPC_Damage", RpcTarget.Others, damage, attacker);
     }
 
     [PunRPC]
-    void RPC_Damage(float damage)
+    void RPC_Damage(float damage, string attacker)
     {
         if (!pnView.IsMine) return;
         currentHealth -= damage;
-        
+        hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
+        Debug.Log(attacker);
         if (currentHealth <= 0)
         {
             playerManager.Die();
         }
-
         pnView.RPC("RPC_UpdateHealth", RpcTarget.All, currentHealth);
+        
     }
 
     [PunRPC]
@@ -228,6 +324,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         if (!pnView.IsMine) // Обновляем здоровье на других клиентах
         {
             hpBar.value = health;
+            hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
+
         }
     }
     private void Look()
@@ -260,7 +358,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             moveAmout = Vector3.Lerp(moveAmout, targetVelocity, smoothTime * Time.deltaTime);
 
             // Останавливаем корутину на случай, если снова пошёл ввод
-            StopAllCoroutines();
+            StopCoroutine(ResetSpeed());
         }
         else
         {
@@ -281,8 +379,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     private void FixedUpdate()
     {
         if (!pnView.IsMine) return;
-
-        // Обновляем позицию с использованием moveAmout
         rb.MovePosition(rb.position + moveAmout * Time.fixedDeltaTime);
     }
 
@@ -292,7 +388,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         if(Input.GetKeyDown(KeyCode.Space) && isGround)
         {
             rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
-            Debug.Log("Jump");
+        
         }
         
     }
@@ -329,15 +425,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         {
             Hashtable hash = new Hashtable();
             hash.Add("index", itemIndex);
+            
             PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
             UpdateAmmoUI();
         }
         pnView.RPC("RPC_SyncWeapon", RpcTarget.All, itemIndex);
     }
-
-
-
-
 
     [PunRPC]
     void RPC_SyncWeapon(int index)
@@ -380,13 +473,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
 
 
-
-
-
-
-
-
-
     public void AddHealth(int amount)
     {
         currentHealth += amount;
@@ -401,7 +487,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         if (!shieldActive)
         {
             shieldActive = true;
-            ShieldObj.SetActive(true);
             Debug.Log("Shield Activated");
 
             // Отключение щита через 10 секунд
@@ -412,13 +497,32 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     private void DeactivateShield()
     {
         shieldActive = false;
-        ShieldObj.SetActive(false);
         Debug.Log("Shield Deactivated");
     }
 
 
 
 
+    private void CameraBobbing()
+    {
+        if (moveAmout.magnitude > 0.1f && isGround)
+        {
+            float speed = isSprinting ? bobbingSpeed * sprintMultiplier : bobbingSpeed;
+            float amountY = isSprinting ? bobbingAmountY * sprintMultiplier : bobbingAmountY;
+            float amountX = isSprinting ? bobbingAmountX * sprintMultiplier : bobbingAmountX;
+
+            bobbingTimer += Time.deltaTime * speed;
+            float newY = defaultCamPosY + Mathf.Sin(bobbingTimer) * amountY;
+            float newX = defaultCamPosX + Mathf.Cos(bobbingTimer * 0.5f) * amountX;
+
+            playerCamera.transform.localPosition = new Vector3(newX, newY, playerCamera.transform.localPosition.z);
+        }
+        else
+        {
+            bobbingTimer = 0f;
+            playerCamera.transform.localPosition = new Vector3(defaultCamPosX, defaultCamPosY, playerCamera.transform.localPosition.z);
+        }
+    }
 
 
 

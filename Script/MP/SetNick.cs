@@ -22,7 +22,8 @@ public class SetNick : MonoBehaviourPunCallbacks
         if (pnView.IsMine)
         {
             // Устанавливаем никнейм в свойствах игрока
-            string nickName = PlayerPrefs.GetString("NickName", "Player");
+            string randomNickname = "Player" + Random.Range(0, 1000);
+            string nickName = PlayerPrefs.GetString("NickName", randomNickname);
             PhotonNetwork.LocalPlayer.NickName = nickName;
             SetNickOnField(nickName);
         }

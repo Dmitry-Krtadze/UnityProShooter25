@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Photon.Pun;
 public class ShootGun : Gun
 {
     [SerializeField] Camera myCam;
+    PlayerController playerC;
+
     public override void Use()
     {
         Shoot();
@@ -23,7 +25,7 @@ public class ShootGun : Gun
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
                 hit.collider.gameObject.GetComponent<IDamageble>()?.
-                    TakeDamage(gunInfo.Damage);
+                    TakeDamage(gunInfo.Damage, PhotonNetwork.NickName);
             }
         }
         else
