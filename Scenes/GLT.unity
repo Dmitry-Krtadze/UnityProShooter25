@@ -1755,12 +1755,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 379669986}
     - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
       propertyPath: spawnPoints.Array.size
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
       propertyPath: objectsToSpawn.Array.size
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
       propertyPath: spawnPoints.Array.data[0]
