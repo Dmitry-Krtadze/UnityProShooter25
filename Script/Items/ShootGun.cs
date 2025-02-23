@@ -19,7 +19,7 @@ public class ShootGun : Gun
 
         if (gunInfo.currentAmmo > 0)
         {
-            gunInfo.currentAmmo--;
+            //gunInfo.currentAmmo--;
             Ray ray = myCam.ViewportPointToRay(new Vector3(0.5f, 0.5f));
             ray.origin = myCam.transform.position;
             if (Physics.Raycast(ray, out RaycastHit hit))
