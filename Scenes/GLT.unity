@@ -1789,11 +1789,11 @@ PrefabInstance:
     - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
       propertyPath: objectsToSpawn.Array.data[0]
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 319606944832797154, guid: f3ed30f056cf78e449c54a2654e656e6, type: 3}
     - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
       propertyPath: objectsToSpawn.Array.data[1]
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 319606944832797154, guid: d80369f814ea846439356d6a6caf97d0, type: 3}
     - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
       propertyPath: objectsToSpawn.Array.data[2]
       value: 
