@@ -44,6 +44,17 @@ MonoBehaviour:
   - RPC_UpdateHealth
   - RPC_SyncWeapon
   - DestroyItem
+  - RPC_AddPlayer
+  - RPC_UpdatePlayerStats
+  - RPC_UpdateLederBoard
+  - SyncLeaderboard
+  - RequestLeaderboardSync
+  - RequestLeaderboard
+  - UpdatePlayerStats
+  - RPC_AddScore
+  - RequestLeaderboardFromMaster
+  - RPC_AddDeath
+  - RPC_AddKill
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
