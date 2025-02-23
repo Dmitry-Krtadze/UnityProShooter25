@@ -5,41 +5,40 @@ public class ItemPickup : MonoBehaviourPunCallbacks
 {
     public enum ItemType { HealthKit, AmmoKit, Shield }
     public ItemType itemType;
+    public int value; // Значение (количество патронов, здоровья и т.п.)
 
-
-    public int value;
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && photonView.IsMine)
+        if (other.CompareTag("Player"))
         {
-            PlayerController playerController = other.GetComponent<PlayerController>();
-            Item item = other.GetComponentInChildren<ShootGun>();
-
-            if (playerController != null)
+            // Обработка подбора только на мастер-клиенте
+            if (PhotonNetwork.IsMasterClient)
             {
-                value = Random.Range(20, 50); // Значение (количество патронов или здоровья)
-                switch (itemType)
-                {
-                    case ItemType.HealthKit:
-                        playerController.AddHealth(value);
-                        break;
-                    case ItemType.AmmoKit:
-                        item.AddAmmo(value);
-                        break;
-                    case ItemType.Shield:
-                        playerController.ActivateShield();
-                        break;
-                }
+                // Определяем случайное значение для эффекта
+                value = Random.Range(20, 50);
 
-                // Синхронизируем удаление предмета между клиентами
-                photonView.RPC("DestroyItem", RpcTarget.All);
+                PhotonView playerPhotonView = other.GetComponent<PhotonView>();
+                if (playerPhotonView != null)
+                {
+                    switch (itemType)
+                    {
+                        case ItemType.HealthKit:
+                            // Вызываем RPC у игрока для добавления здоровья
+                            playerPhotonView.RPC("RPC_AddHealth", RpcTarget.All, value);
+                            break;
+                        case ItemType.AmmoKit:
+                            // Вызываем RPC у игрока для добавления патронов
+                            playerPhotonView.RPC("RPC_AddAmmo", RpcTarget.All, value);
+                            break;
+                        case ItemType.Shield:
+                            // Вызываем RPC у игрока для активации щита
+                            playerPhotonView.RPC("RPC_ActivateShield", RpcTarget.All);
+                            break;
+                    }
+                }
+                // Синхронизированное уничтожение предмета
+                PhotonNetwork.Destroy(gameObject);
             }
         }
-    }
-
-    [PunRPC]
-    private void DestroyItem()
-    {
-        Destroy(gameObject);
     }
 }

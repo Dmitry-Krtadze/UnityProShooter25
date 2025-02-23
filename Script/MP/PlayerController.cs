@@ -307,15 +307,21 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     void RPC_Damage(float damage, string attacker)
     {
         if (!pnView.IsMine) return;
+
         currentHealth -= damage;
         hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
         Debug.Log(attacker);
+
         if (currentHealth <= 0)
         {
+            // ќбновл€ем статистику: жертва получает смерть, а атакующий Ц убийство
+            LeaderBoardManager.Instance.photonView.RPC("RPC_AddDeath", RpcTarget.MasterClient, PhotonNetwork.NickName);
+            LeaderBoardManager.Instance.photonView.RPC("RPC_AddKill", RpcTarget.MasterClient, attacker);
+
             playerManager.Die();
         }
+
         pnView.RPC("RPC_UpdateHealth", RpcTarget.All, currentHealth);
-        
     }
 
     [PunRPC]
@@ -499,7 +505,27 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         shieldActive = false;
         Debug.Log("Shield Deactivated");
     }
+    [PunRPC]
+    public void RPC_AddHealth(int amount)
+    {
+        AddHealth(amount);
+        // ќбновление UI, если требуетс€
+    }
 
+    [PunRPC]
+    public void RPC_AddAmmo(int amount)
+    {
+        // ѕредполагаетс€, что текущий экипированный предмет Ц оружие
+        Item currentWeapon = items[itemIndex];
+        currentWeapon.AddAmmo(amount);
+        UpdateAmmoUI();
+    }
+
+    [PunRPC]
+    public void RPC_ActivateShield()
+    {
+        ActivateShield();
+    }
 
 
 
