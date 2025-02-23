@@ -5,9 +5,9 @@ public class ObjectSpawner : MonoBehaviourPunCallbacks
 {
     public static ObjectSpawner Instance;
 
-    public GameObject[] objectsToSpawn; // Массив объектов для спавна
-    public Transform[] spawnPoints; // Точки спавна
-    public float spawnInterval = 5f; // Интервал между спавнами
+    public GameObject[] objectsToSpawn; // Массив префабов для спавна
+    public Transform[] spawnPoints;     // Точки спавна
+    public float spawnInterval = 5f;      // Интервал между спавнами
 
     private float nextSpawnTime = 0f;
 
@@ -18,7 +18,7 @@ public class ObjectSpawner : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        if (PhotonNetwork.IsMasterClient) // Только мастер-игрок управляет спавном
+        if (PhotonNetwork.IsMasterClient)
         {
             nextSpawnTime = Time.time + spawnInterval;
         }
@@ -41,7 +41,7 @@ public class ObjectSpawner : MonoBehaviourPunCallbacks
         GameObject objectToSpawn = objectsToSpawn[randomObjectIndex];
         Transform spawnPoint = spawnPoints[randomPointIndex];
 
-        // Создаём объект через PhotonNetwork.Instantiate
+        // Синхронизированный спавн через PhotonNetwork.Instantiate
         GameObject obj = PhotonNetwork.Instantiate(objectToSpawn.name, spawnPoint.position, spawnPoint.rotation);
         obj.transform.SetParent(transform);
     }

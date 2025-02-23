@@ -505,7 +505,27 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         shieldActive = false;
         Debug.Log("Shield Deactivated");
     }
+    [PunRPC]
+    public void RPC_AddHealth(int amount)
+    {
+        AddHealth(amount);
+        // Обновление UI, если требуется
+    }
 
+    [PunRPC]
+    public void RPC_AddAmmo(int amount)
+    {
+        // Предполагается, что текущий экипированный предмет – оружие
+        Item currentWeapon = items[itemIndex];
+        currentWeapon.AddAmmo(amount);
+        UpdateAmmoUI();
+    }
+
+    [PunRPC]
+    public void RPC_ActivateShield()
+    {
+        ActivateShield();
+    }
 
 
 
