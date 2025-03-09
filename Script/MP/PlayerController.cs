@@ -5,43 +5,34 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
+
 public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 {
-
-    
-
-    //Переменные для перемещения, камеры
+    // Переменные для перемещения, камеры
     [SerializeField] public GameObject playerCamera;
-    [SerializeField]
-    private float
-        walkSpeed, sprintSpeed, mouseSensitivity,
-        jumpForce, smoothTime;
-    private float vertacalLookRotation;
-    [SerializeField]  private bool isGround;
-    private Vector3 smothMove;
-    private Vector3 moveAmout;
-    private Rigidbody rb;
+    [SerializeField] private float walkSpeed, sprintSpeed, mouseSensitivity, jumpForce, smoothTime;
+    private float verticalLookRotation;
+    [SerializeField] private bool isGround = true;
+    private Vector3 moveAmount; // Общая скорость, включая вертикальную составляющую
     public PhotonView pnView;
 
-    //Масив для оружия
+    // Используем CharacterController вместо Rigidbody
+    private CharacterController characterController;
+
+    // Массив для оружия
     [SerializeField] Item[] items;
     private int itemIndex;
     private int prevItemIndex = -1;
 
-    //Переменные для хп
+    // Переменные для хп
     [SerializeField] private float maxHealth = 100f;
     [SerializeField] private float currentHealth;
-    //хпБар сверху игрока
+    // Хп-бар сверху игрока
     [SerializeField] Slider hpBar;
-    
-
 
     private PlayerManager playerManager;
     private bool isCursorLocked = true;
-    [SerializeField]  GameObject FirstWeapon;
-
-
-
+    [SerializeField] GameObject FirstWeapon;
 
     [SerializeField] public Text ammoText;
     [SerializeField] public Text hpBarPlayer;
@@ -50,71 +41,62 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     private bool isReloading = false;
     private Item currentItem;
 
-
-
-
     [SerializeField] private GameObject ShieldObj;
-
-
     SoundGodScript soundGod;
-
     LeaderBoardManager LeaderBoardManager;
     LeaderboardUI LeaderboardUI;
 
-
-
-    [SerializeField] private float bobbingSpeed = 7f; // Скорость пошатывания
-    [SerializeField] private float bobbingAmountY = 0.05f; // Амплитуда пошатывания вверх-вниз
-    [SerializeField] private float bobbingAmountX = 0.03f; // Амплитуда пошатывания влево-вправо
-    [SerializeField] private float sprintMultiplier = 1.8f; // Ускорение при спринте
+    [SerializeField] private float bobbingSpeed = 7f;      // Скорость пошатывания
+    [SerializeField] private float bobbingAmountY = 0.05f;   // Амплитуда пошатывания вверх-вниз
+    [SerializeField] private float bobbingAmountX = 0.03f;   // Амплитуда пошатывания влево-вправо
+    [SerializeField] private float sprintMultiplier = 1.8f;  // Ускорение при спринте
     private float defaultCamPosY;
     private float defaultCamPosX;
     private float bobbingTimer = 0f;
-    private bool isSprinting => Input.GetKey(KeyCode.LeftShift) && moveAmout.magnitude > 0.1f;
+    private bool isSprinting => Input.GetKey(KeyCode.LeftShift) && (new Vector3(moveAmount.x, 0, moveAmount.z).magnitude > 0.1f);
 
+    // Новые переменные для эффектов выстрела
+    [SerializeField] private GameObject muzzleFlashPrefab;
+    [SerializeField] private GameObject[] impactEffectPrefabs;
+    [SerializeField] private GameObject bulletHolePrefab;
+    [SerializeField] private float range = 100f;
+    private Transform activeMuzzle;
 
+    [SerializeField] private float autoFireRate = 6f; // количество выстрелов в секунду
+    private float nextFireTime = 0f;
 
+    // Параметры прыжка и гравитации
+    private float verticalVelocity;
+    [SerializeField] private float gravity = -9.81f;
+    [SerializeField] private float bobbingSmoothSpeed = 5f;
 
     private void Awake()
     {
-        soundGod = FindObjectOfType<SoundGodScript>();  
-
+        soundGod = FindObjectOfType<SoundGodScript>();
         pnView = GetComponent<PhotonView>();
-        rb = GetComponent<Rigidbody>();
-        
+        // Получаем CharacterController (убедитесь, что он добавлен к объекту)
+        characterController = GetComponent<CharacterController>();
+
         currentHealth = maxHealth;
         hpBar.maxValue = maxHealth;
         hpBar.value = currentHealth;
 
-        
-
         playerManager = PhotonView.Find((int)pnView.InstantiationData[0])
             .GetComponent<PlayerManager>();
-
-
-
     }
-
-
 
     private void Start()
     {
-      
-
         if (!pnView.IsMine)
         {
             Destroy(playerCamera);
-            rb.isKinematic = true; // Отключаем физику вместо удаления Rigidbody
-
-            // Деактивируем UI
+            // Отключаем управление для чужих игроков
             if (ammoText != null) ammoText.gameObject.SetActive(false);
             if (hpBarPlayer != null) hpBarPlayer.gameObject.SetActive(false);
-
         }
         else
         {
             playerCamera.SetActive(true);
-            // Активируем UI только для локального игрока
             if (ammoText != null)
             {
                 ammoText.gameObject.SetActive(true);
@@ -131,21 +113,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
                 defaultCamPosX = playerCamera.transform.localPosition.x;
             }
             EquipItem(0);
-            
             UpdateAmmoUI();
         }
 
         LockCursor();
         LeaderBoardManager = GameObject.FindGameObjectWithTag("LeaderBoardManager").GetComponent<LeaderBoardManager>();
-
-
-
         LeaderBoardManager.Instance.photonView.RPC("RequestLeaderboardFromMaster", RpcTarget.MasterClient);
     }
-
-    
-
-
 
     private void StartReload(Item item)
     {
@@ -158,53 +132,42 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         if (currentItem.weaponType == "Pistol")
         {
             GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "PistolReload"));
-        } else if (currentItem.weaponType == "AK47")
+        }
+        else if (currentItem.weaponType == "AK47")
         {
             GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "AutoReload"));
         }
-        
 
         reloadStartTime = Time.time;
     }
 
-
     private void Update()
     {
         if (!pnView.IsMine)
-        {
             return;
 
-        }
         Look();
-        Movement();
-        Jump();
+        Movement(); // Обрабатываем движение и прыжок в одном методе
         SelectWeapon();
 
-        if (!isReloading) { 
+        if (!isReloading)
+        {
             UseItem();
         }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // Переключаем состояние курсора
             isCursorLocked = !isCursorLocked;
-
             if (isCursorLocked)
                 LockCursor();
             else
                 UnlockCursor();
         }
-        hpBar.value = currentHealth;
 
+        hpBar.value = currentHealth;
         hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
 
-        if (shieldActive)
-        {
-            ShieldObj.SetActive(true);
-        }
-        else
-        {
-            ShieldObj.SetActive(false);
-        }
+        ShieldObj.SetActive(shieldActive);
+
         if (isReloading)
         {
             if (Time.time >= reloadStartTime + currentItem.reloadTime)
@@ -221,63 +184,65 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
                 UpdateAmmoUI();
             }
         }
-        
+
         CameraBobbing();
     }
-    private void UseItem()
+
+    // Объединяем логику горизонтального движения и прыжка
+    private void Movement()
     {
-        
-        Item currentItem = items[itemIndex];
-        if (isReloading) return;
-        if (currentItem.isReloading) return;
+        // Получаем горизонтальное направление ввода
+        Vector3 inputDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
+        float targetSpeed = Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed;
+        Vector3 horizontalMove = transform.TransformDirection(inputDir) * targetSpeed;
 
-        if (Input.GetMouseButtonDown(0))
+        // Обработка прыжка и гравитации:
+        if (characterController.isGrounded)
         {
-            if (currentItem.currentAmmo > 0 )
+            // Если нажата клавиша прыжка, устанавливаем вертикальную скорость
+            if (Input.GetKeyDown(KeyCode.Space))
             {
-                if (!PhotonNetwork.IsMasterClient)
-                {
-                    LeaderBoardManager.Instance.photonView.RPC("RPC_AddScore", RpcTarget.MasterClient, PhotonNetwork.NickName, 1);
-                }
-                else
-                {
-                    LeaderBoardManager.Instance.RPC_AddScore(PhotonNetwork.NickName, 1);
-                }
-
-
-
-
-                items[itemIndex].Use();
-                currentItem.currentAmmo--;
-                currentItem = items[itemIndex]; // Обновление состояния
-                string weaponType = currentItem.weaponType;
-
-                GetComponent<RecoilController>().ApplyRecoil(weaponType);
-
-                // Передаём имя звука для выстрела
-                if (currentItem.weaponType == "Pistol")
-                {
-                    GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "PistolShoot"));
-                }
-                else if (currentItem.weaponType == "AK47")
-                {
-                    GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "AutoShoot"));
-                }
-
-                UpdateAmmoUI();
-                GetComponentInChildren<WeaponKickback>().ApplyRecoil(weaponType);
+                verticalVelocity = jumpForce;
             }
             else
             {
-                // Передаём имя звука для пустого магазина
-                if (currentItem.weaponType == "Pistol")
-                {
-                    GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "PistolEmpty"));
-                }
-                else if (currentItem.weaponType == "AK47")
-                {
-                    GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "AutoEmpty"));
-                };
+                // Если на земле, устанавливаем небольшое отрицательное значение для "прилипания"
+                verticalVelocity = -1f;
+            }
+        }
+        else
+        {
+            verticalVelocity += gravity * Time.deltaTime;
+        }
+
+        // Объединяем горизонтальную и вертикальную составляющие
+        moveAmount = horizontalMove;
+        moveAmount.y = verticalVelocity;
+
+        characterController.Move(moveAmount * Time.deltaTime);
+    }
+
+    private void UseItem()
+    {
+        Item currentItem = items[itemIndex];
+        if (isReloading || currentItem.isReloading) return;
+
+        // Для пистолета – одиночный выстрел
+        if (currentItem.weaponType == "Pistol")
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                ExecuteShot(currentItem);
+                LeaderBoardManager.Instance.photonView.RPC("RPC_AddScore", RpcTarget.MasterClient, PhotonNetwork.NickName, 1);
+            }
+        }
+        // Для автомата – очередной выстрел при удержании кнопки
+        else if (currentItem.weaponType == "AK47")
+        {
+            if (Input.GetMouseButton(0) && Time.time >= nextFireTime)
+            {
+                nextFireTime = Time.time + (1f / autoFireRate);
+                ExecuteShot(currentItem);
             }
         }
 
@@ -287,6 +252,80 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         }
     }
 
+    private void ExecuteShot(Item currentItem)
+    {
+        if (currentItem.currentAmmo > 0)
+        {
+            items[itemIndex].Use();
+            currentItem.currentAmmo--;
+            string weaponType = currentItem.weaponType;
+            GetComponent<RecoilController>().ApplyRecoil(weaponType);
+
+            if (weaponType == "Pistol")
+            {
+                GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "PistolShoot"));
+            }
+            else if (weaponType == "AK47")
+            {
+                GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "AutoShoot"));
+            }
+
+            UpdateAmmoUI();
+            GetComponentInChildren<WeaponKickback>().ApplyRecoil(weaponType);
+
+            // Луч из текущей позиции и направления камеры
+            Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+            if (Physics.Raycast(ray, out RaycastHit hit, range))
+            {
+                if (activeMuzzle != null)
+                {
+                    pnView.RPC("RPC_SpawnMuzzleFlash", RpcTarget.All, activeMuzzle.position, activeMuzzle.rotation);
+                }
+                pnView.RPC("RPC_SpawnImpactEffect", RpcTarget.All, hit.point, hit.normal);
+            }
+        }
+        else
+        {
+            if (currentItem.weaponType == "Pistol")
+            {
+                GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "PistolEmpty"));
+            }
+            else if (currentItem.weaponType == "AK47")
+            {
+                GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "AutoEmpty"));
+            }
+        }
+    }
+
+    [PunRPC]
+    void RPC_SpawnMuzzleFlash(Vector3 position, Quaternion rotation)
+    {
+        GameObject flash = Instantiate(muzzleFlashPrefab, position, rotation);
+        if (activeMuzzle != null)
+        {
+            flash.transform.SetParent(activeMuzzle);
+            flash.transform.localPosition = Vector3.zero;
+            flash.transform.localRotation = Quaternion.identity;
+        }
+        Destroy(flash, 0.5f);
+    }
+
+    [PunRPC]
+    void RPC_SpawnImpactEffect(Vector3 hitPoint, Vector3 hitNormal)
+    {
+        if (impactEffectPrefabs != null && impactEffectPrefabs.Length > 0)
+        {
+            int randomImpactIndex = Random.Range(0, impactEffectPrefabs.Length);
+            Instantiate(impactEffectPrefabs[randomImpactIndex], hitPoint, Quaternion.LookRotation(hitNormal));
+        }
+        if (bulletHolePrefab != null)
+        {
+            GameObject bulletHole = Instantiate(bulletHolePrefab,
+                                                  hitPoint + hitNormal * 0.01f,
+                                                  Quaternion.LookRotation(hitNormal));
+            Destroy(bulletHole, 10f);
+        }
+    }
 
     [PunRPC]
     void RPC_AddScore(string playerName, int scoreToAdd)
@@ -296,7 +335,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         LeaderBoardManager.UpdateLeaderboard(playerName, currentStats.kills, currentStats.deaths, newScore);
         LeaderBoardManager.SyncLeaderboard();
     }
-
 
     public void TakeDamage(float damage, string attacker)
     {
@@ -314,10 +352,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
         if (currentHealth <= 0)
         {
-            // Обновляем статистику: жертва получает смерть, а атакующий – убийство
             LeaderBoardManager.Instance.photonView.RPC("RPC_AddDeath", RpcTarget.MasterClient, PhotonNetwork.NickName);
             LeaderBoardManager.Instance.photonView.RPC("RPC_AddKill", RpcTarget.MasterClient, attacker);
-
             playerManager.Die();
         }
 
@@ -327,85 +363,24 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     [PunRPC]
     void RPC_UpdateHealth(float health)
     {
-        if (!pnView.IsMine) // Обновляем здоровье на других клиентах
+        if (!pnView.IsMine)
         {
             hpBar.value = health;
             hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
-
         }
     }
+
     private void Look()
     {
-        transform.Rotate(Vector3.up * Input.GetAxisRaw("Mouse X") *
-            mouseSensitivity);
-        vertacalLookRotation += Input.GetAxisRaw("Mouse Y") *
-            mouseSensitivity;
-        vertacalLookRotation = Mathf.Clamp(vertacalLookRotation,
-            -80f, 90f);
-        playerCamera.transform.localEulerAngles = Vector3.left *
-            vertacalLookRotation;
-    }
-    private void Movement()
-    {
-        // Получаем направление движения
-        Vector3 moveDir = new Vector3(
-            Input.GetAxisRaw("Horizontal"),
-            0,
-            Input.GetAxisRaw("Vertical")).normalized;
-
-        // Проверяем, есть ли активный ввод
-        if (moveDir != Vector3.zero)
-        {
-            // Если есть ввод, рассчитываем скорость
-            float targetSpeed = (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed);
-            Vector3 targetVelocity = transform.TransformDirection(moveDir) * targetSpeed;
-
-            // Плавное изменение скорости
-            moveAmout = Vector3.Lerp(moveAmout, targetVelocity, smoothTime * Time.deltaTime);
-
-            // Останавливаем корутину на случай, если снова пошёл ввод
-            StopCoroutine(ResetSpeed());
-        }
-        else
-        {
-            // Если ввода нет, запускаем корутину на обнуление скорости
-            if (moveAmout != Vector3.zero)
-            {
-                StartCoroutine(ResetSpeed());
-            }
-        }
+        transform.Rotate(Vector3.up * Input.GetAxisRaw("Mouse X") * mouseSensitivity);
+        verticalLookRotation += Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
+        verticalLookRotation = Mathf.Clamp(verticalLookRotation, -80f, 90f);
+        playerCamera.transform.localEulerAngles = Vector3.left * verticalLookRotation;
     }
 
-    private IEnumerator ResetSpeed()
-    {
-        yield return new WaitForSeconds(0.2f);
-        moveAmout = Vector3.zero;
-    }
-
-    private void FixedUpdate()
-    {
-        if (!pnView.IsMine) return;
-        rb.MovePosition(rb.position + moveAmout * Time.fixedDeltaTime);
-    }
-
-
-    private void Jump()
-    {
-        if(Input.GetKeyDown(KeyCode.Space) && isGround)
-        {
-            rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
-        
-        }
-        
-    }
-
-    public void GroundState(bool iSGround)
-    {
-        this.isGround = iSGround;
-    }
     private void SelectWeapon()
     {
-        for(int i = 0;i < items.Length; i++)
+        for (int i = 0; i < items.Length; i++)
         {
             if (Input.GetKeyDown((i + 1).ToString()))
             {
@@ -414,24 +389,23 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             }
         }
     }
+
     private void EquipItem(int index)
     {
         if (index == prevItemIndex) return;
         itemIndex = index;
         items[itemIndex].itemGameObject.SetActive(true);
-
+        activeMuzzle = items[itemIndex].itemGameObject.transform.Find("Muzzle");
         if (prevItemIndex != -1)
         {
             items[prevItemIndex].itemGameObject.SetActive(false);
         }
         prevItemIndex = itemIndex;
 
- 
         if (pnView.IsMine)
         {
             Hashtable hash = new Hashtable();
             hash.Add("index", itemIndex);
-            
             PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
             UpdateAmmoUI();
         }
@@ -441,32 +415,31 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     [PunRPC]
     void RPC_SyncWeapon(int index)
     {
-        if (!pnView.IsMine) // Для всех клиентов, кроме владельца
+        if (!pnView.IsMine)
         {
-            EquipItem(index); // Экипируем оружие, которое указано на других клиентах
+            EquipItem(index);
         }
     }
 
     public void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
-
     {
-        if(!pnView.IsMine && targetPlayer == pnView.Owner)
+        if (!pnView.IsMine && targetPlayer == pnView.Owner)
         {
             EquipItem((int)changedProps["index"]);
         }
     }
+
     private void LockCursor()
     {
-        Cursor.lockState = CursorLockMode.Locked; // Фиксируем курсор в центре
-        Cursor.visible = false;                  // Скрываем курсор
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     private void UnlockCursor()
     {
-        Cursor.lockState = CursorLockMode.None;  // Снимаем блокировку курсора
-        Cursor.visible = true;                   // Делаем курсор видимым
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
-
 
     private void UpdateAmmoUI()
     {
@@ -475,14 +448,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         ammoText.text = currentItem.currentAmmo + " / " + currentItem.reserveAmmo;
     }
 
-
-
-
-
     public void AddHealth(int amount)
     {
         currentHealth += amount;
-        currentHealth = Mathf.Clamp(currentHealth, 0, 100); // Максимум 100 здоровья
+        currentHealth = Mathf.Clamp(currentHealth, 0, 100);
         Debug.Log($"Health: {currentHealth}");
     }
 
@@ -494,8 +463,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         {
             shieldActive = true;
             Debug.Log("Shield Activated");
-
-            // Отключение щита через 10 секунд
             Invoke(nameof(DeactivateShield), 10f);
         }
     }
@@ -505,17 +472,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         shieldActive = false;
         Debug.Log("Shield Deactivated");
     }
+
     [PunRPC]
     public void RPC_AddHealth(int amount)
     {
         AddHealth(amount);
-        // Обновление UI, если требуется
     }
 
     [PunRPC]
     public void RPC_AddAmmo(int amount)
     {
-        // Предполагается, что текущий экипированный предмет – оружие
         Item currentWeapon = items[itemIndex];
         currentWeapon.AddAmmo(amount);
         UpdateAmmoUI();
@@ -527,30 +493,31 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         ActivateShield();
     }
 
-
-
     private void CameraBobbing()
     {
-        if (moveAmout.magnitude > 0.1f && isGround)
+        // Используем только горизонтальную составляющую движения для тряски
+        Vector3 horizontalMove = new Vector3(moveAmount.x, 0, moveAmount.z);
+        if (horizontalMove.magnitude > 0.1f && characterController.isGrounded)
         {
             float speed = isSprinting ? bobbingSpeed * sprintMultiplier : bobbingSpeed;
             float amountY = isSprinting ? bobbingAmountY * sprintMultiplier : bobbingAmountY;
             float amountX = isSprinting ? bobbingAmountX * sprintMultiplier : bobbingAmountX;
 
             bobbingTimer += Time.deltaTime * speed;
-            float newY = defaultCamPosY + Mathf.Sin(bobbingTimer) * amountY;
-            float newX = defaultCamPosX + Mathf.Cos(bobbingTimer * 0.5f) * amountX;
+            float targetY = defaultCamPosY + Mathf.Sin(bobbingTimer) * amountY;
+            float targetX = defaultCamPosX + Mathf.Cos(bobbingTimer * 0.5f) * amountX;
 
-            playerCamera.transform.localPosition = new Vector3(newX, newY, playerCamera.transform.localPosition.z);
+            // Плавно интерполируем позицию камеры к целевому смещению
+            float smoothX = Mathf.Lerp(playerCamera.transform.localPosition.x, targetX, Time.deltaTime * bobbingSmoothSpeed);
+            float smoothY = Mathf.Lerp(playerCamera.transform.localPosition.y, targetY, Time.deltaTime * bobbingSmoothSpeed);
+            playerCamera.transform.localPosition = new Vector3(smoothX, smoothY, playerCamera.transform.localPosition.z);
         }
         else
         {
-            bobbingTimer = 0f;
-            playerCamera.transform.localPosition = new Vector3(defaultCamPosX, defaultCamPosY, playerCamera.transform.localPosition.z);
+            // Плавно возвращаем камеру к исходному положению
+            float smoothX = Mathf.Lerp(playerCamera.transform.localPosition.x, defaultCamPosX, Time.deltaTime * bobbingSmoothSpeed);
+            float smoothY = Mathf.Lerp(playerCamera.transform.localPosition.y, defaultCamPosY, Time.deltaTime * bobbingSmoothSpeed);
+            playerCamera.transform.localPosition = new Vector3(smoothX, smoothY, playerCamera.transform.localPosition.z);
         }
     }
-
-
-
-
 }

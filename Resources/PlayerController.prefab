@@ -601,6 +601,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   leaderboardText: {fileID: 7370745491762835384}
+--- !u!1 &4000633158966139859
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2093329546892301409}
+  m_Layer: 6
+  m_Name: Muzzle
+  m_TagString: muzzle
+  m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2093329546892301409
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4000633158966139859}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.4409, y: 0.3166, z: 1.579}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5003469535047610020}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5035153138261011900
 GameObject:
   m_ObjectHideFlags: 0
@@ -659,6 +690,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -1021,6 +1053,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -1175,6 +1208,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6503926700488941913}
+  - {fileID: 2093329546892301409}
   m_Father: {fileID: 2167315302426362999}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1347,6 +1381,37 @@ MonoBehaviour:
   recoilSpeed: 10
   rotationAmount: 2
   rotationSpeed: 10
+--- !u!1 &7757095493860729271
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9172847936098563708}
+  m_Layer: 6
+  m_Name: Muzzle
+  m_TagString: muzzle
+  m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9172847936098563708
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7757095493860729271}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.473, y: 0.258, z: 1.933}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 94165478215679961}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8261103911283900056
 GameObject:
   m_ObjectHideFlags: 0
@@ -1461,6 +1526,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2503503022284795197}
+  - {fileID: 9172847936098563708}
   m_Father: {fileID: 2167315302426362999}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1729,11 +1795,11 @@ GameObject:
   - component: {fileID: 8926392193590416434}
   - component: {fileID: 8926392193590416435}
   - component: {fileID: 8926392193590416432}
-  - component: {fileID: 8926392193590416433}
   - component: {fileID: 8926392193590416438}
   - component: {fileID: 4529711545312793024}
   - component: {fileID: 8926392193590416439}
   - component: {fileID: 7148987751454900937}
+  - component: {fileID: 4461195172264567894}
   m_Layer: 6
   m_Name: PlayerController
   m_TagString: Player
@@ -1826,22 +1892,6 @@ CapsuleCollider:
   m_Height: 2.0532317
   m_Direction: 1
   m_Center: {x: 0, y: -0.026615858, z: 0.10398698}
---- !u!54 &8926392193590416433
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8926392193590416436}
-  serializedVersion: 2
-  m_Mass: 100
-  m_Drag: 1
-  m_AngularDrag: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 1
-  m_Constraints: 112
-  m_CollisionDetection: 0
 --- !u!114 &8926392193590416438
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1858,7 +1908,7 @@ MonoBehaviour:
   walkSpeed: 5
   sprintSpeed: 10
   mouseSensitivity: 2
-  jumpForce: 500
+  jumpForce: 5
   smoothTime: 1
   isGround: 0
   pnView: {fileID: 8926392193590416439}
@@ -1876,6 +1926,20 @@ MonoBehaviour:
   bobbingAmountY: 0.05
   bobbingAmountX: 0.03
   sprintMultiplier: 1.8
+  muzzleFlashPrefab: {fileID: 100006, guid: 82885f019f5c0194cb53b5340a22c304, type: 3}
+  impactEffectPrefabs:
+  - {fileID: 100002, guid: 6d1837291e815c342914745af772bdf5, type: 3}
+  - {fileID: 100002, guid: a3152791e85467241b4806fcf50f4928, type: 3}
+  - {fileID: 100002, guid: a7a13e0df735a6141a5450b39a2b812a, type: 3}
+  - {fileID: 100002, guid: 1dc65c2ac8fb58648909ad95903a5663, type: 3}
+  - {fileID: 100002, guid: 017dddaff64096d48a87d773c02ce876, type: 3}
+  - {fileID: 100002, guid: 08ead664500c1b441bf1f19dfd2852ab, type: 3}
+  - {fileID: 100002, guid: 60d31629c00e26b46a34a664d244fa7b, type: 3}
+  - {fileID: 100002, guid: 77adf73fd047bd2468fe078bf55451e6, type: 3}
+  bulletHolePrefab: {fileID: 100006, guid: 8709fb618e8c53549b3b3b2b2151d07b, type: 3}
+  range: 100
+  autoFireRate: 10
+  gravity: -9.81
   shieldActive: 0
 --- !u!114 &4529711545312793024
 MonoBehaviour:
@@ -1935,6 +1999,24 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 1
+--- !u!143 &4461195172264567894
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8926392193590416436}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &2680912545020873430
 PrefabInstance:
   m_ObjectHideFlags: 0

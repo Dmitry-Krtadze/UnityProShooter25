@@ -58,6 +58,8 @@ MonoBehaviour:
   - RPC_ActivateShield
   - RPC_AddAmmo
   - RPC_AddHealth
+  - RPC_SpawnImpactEffect
+  - RPC_SpawnMuzzleFlash
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
