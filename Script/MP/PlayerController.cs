@@ -70,6 +70,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     [SerializeField] private float gravity = -9.81f;
     [SerializeField] private float bobbingSmoothSpeed = 5f;
 
+
+    [SerializeField] private float landingShakeDuration = 0.3f; // базовая длительность тряски при приземлении
+    [SerializeField] private float maxLandingShakeMagnitude = 0.3f; // максимальное смещение камеры при длинном полете
+    private float landingShakeTimer = 0f;
+    private float landingShakeMagnitude = 0f;
+    private float airTime = 0f; // сколько времени игрок находится в воздухе
+    private bool wasGrounded = true; // для отслеживания перехода из состояния "на земле"
+
     private void Awake()
     {
         soundGod = FindObjectOfType<SoundGodScript>();
@@ -186,6 +194,23 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         }
 
         CameraBobbing();
+
+        if (!characterController.isGrounded)
+        {
+            airTime += Time.deltaTime;
+        }
+        else
+        {
+            if (!wasGrounded)
+            {
+                // Игрок только что приземлился:
+                // Чем дольше в воздухе, тем сильнее эффект (с ограничением)
+                landingShakeMagnitude = Mathf.Lerp(0f, maxLandingShakeMagnitude, Mathf.Clamp01(airTime / 2f));
+                landingShakeTimer = landingShakeDuration;
+                airTime = 0f;
+            }
+        }
+        wasGrounded = characterController.isGrounded;
     }
 
     // Объединяем логику горизонтального движения и прыжка
@@ -495,8 +520,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
     private void CameraBobbing()
     {
-        // Используем только горизонтальную составляющую движения для тряски
+        // Рассчитываем базовый эффект боббинга (используем только горизонтальное движение)
         Vector3 horizontalMove = new Vector3(moveAmount.x, 0, moveAmount.z);
+        Vector3 targetPos;
         if (horizontalMove.magnitude > 0.1f && characterController.isGrounded)
         {
             float speed = isSprinting ? bobbingSpeed * sprintMultiplier : bobbingSpeed;
@@ -504,20 +530,30 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             float amountX = isSprinting ? bobbingAmountX * sprintMultiplier : bobbingAmountX;
 
             bobbingTimer += Time.deltaTime * speed;
-            float targetY = defaultCamPosY + Mathf.Sin(bobbingTimer) * amountY;
-            float targetX = defaultCamPosX + Mathf.Cos(bobbingTimer * 0.5f) * amountX;
-
-            // Плавно интерполируем позицию камеры к целевому смещению
-            float smoothX = Mathf.Lerp(playerCamera.transform.localPosition.x, targetX, Time.deltaTime * bobbingSmoothSpeed);
-            float smoothY = Mathf.Lerp(playerCamera.transform.localPosition.y, targetY, Time.deltaTime * bobbingSmoothSpeed);
-            playerCamera.transform.localPosition = new Vector3(smoothX, smoothY, playerCamera.transform.localPosition.z);
+            float bobY = defaultCamPosY + Mathf.Sin(bobbingTimer) * amountY;
+            float bobX = defaultCamPosX + Mathf.Cos(bobbingTimer * 0.5f) * amountX;
+            targetPos = new Vector3(bobX, bobY, playerCamera.transform.localPosition.z);
         }
         else
         {
-            // Плавно возвращаем камеру к исходному положению
-            float smoothX = Mathf.Lerp(playerCamera.transform.localPosition.x, defaultCamPosX, Time.deltaTime * bobbingSmoothSpeed);
-            float smoothY = Mathf.Lerp(playerCamera.transform.localPosition.y, defaultCamPosY, Time.deltaTime * bobbingSmoothSpeed);
-            playerCamera.transform.localPosition = new Vector3(smoothX, smoothY, playerCamera.transform.localPosition.z);
+            bobbingTimer = 0f;
+            targetPos = new Vector3(defaultCamPosX, defaultCamPosY, playerCamera.transform.localPosition.z);
         }
+
+        // Если есть эффект приземления, добавляем случайное смещение
+        if (landingShakeTimer > 0)
+        {
+            Vector3 landingShakeOffset = new Vector3(
+                Random.Range(-landingShakeMagnitude, landingShakeMagnitude),
+                Random.Range(-landingShakeMagnitude, landingShakeMagnitude),
+                0);
+            targetPos += landingShakeOffset;
+            landingShakeTimer -= Time.deltaTime;
+        }
+
+        // Плавно интерполируем положение камеры к целевому значению
+        float smoothX = Mathf.Lerp(playerCamera.transform.localPosition.x, targetPos.x, Time.deltaTime * 5f);
+        float smoothY = Mathf.Lerp(playerCamera.transform.localPosition.y, targetPos.y, Time.deltaTime * 5f);
+        playerCamera.transform.localPosition = new Vector3(smoothX, smoothY, targetPos.z);
     }
 }
