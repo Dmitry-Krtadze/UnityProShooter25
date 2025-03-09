@@ -1,137 +1,88 @@
-using System.Collections;
+using Photon.Pun;
 using UnityEngine;
 
-public class EnemyPatrol : MonoBehaviour
+public class ExampleNetworkedObject : MonoBehaviourPun
 {
-    [SerializeField] private float enemySpeed = 5f;
-    [SerializeField] private GameObject patrolIntoPlayer;
-    [SerializeField] private float enemyPatrolDistance = 6f; 
-    [SerializeField] private LayerMask playerLayerMask;
-
-    private int currentPointIndex = 0;
-    private Transform[] patrolPoints;
-    private Rigidbody rb;
+    private PhotonView _photonView;
+    private Rigidbody _rb;
+    [SerializeField] private float moveSpeed = 5f;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        rb.freezeRotation = true; // Запрещаем физическое вращение
+        // Инициализация компонентов
+        _photonView = GetComponent<PhotonView>();
+        _rb = GetComponent<Rigidbody>();
 
-        InitializePatrolPoints();
-        StartCoroutine(FindPlayerWhenAvailable());
-    }
-
-    void InitializePatrolPoints()
-    {
-        GameObject[] points = GameObject.FindGameObjectsWithTag("PatrolPoint");
-        if (points.Length == 0)
+        // Проверка для локального игрока
+        if (_photonView != null && _photonView.IsMine)
         {
-            Debug.LogError("No patrol points found!");
-            return;
+            // Удален вызов SetupLocalPlayer()
         }
-
-        patrolPoints = new Transform[points.Length];
-        for (int i = 0; i < points.Length; i++)
-        {
-            patrolPoints[i] = points[i].transform;
-        }
-
-        transform.position = patrolPoints[0].position;
-    }
-
-    private IEnumerator FindPlayerWhenAvailable()
-    {
-        while (patrolIntoPlayer == null)
-        {
-            patrolIntoPlayer = GameObject.FindGameObjectWithTag("Player");
-            yield return new WaitForSeconds(0.1f); // Делаем паузу перед следующей попыткой поиска
-        }
-    }
-
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, enemyPatrolDistance);
     }
 
     void Update()
     {
-        if (patrolPoints == null || patrolPoints.Length == 0) return;
+        // Проверка на null перед использованием
+        if (_photonView == null || !_photonView.IsMine) return;
 
-        CheckForPlayer();
-
-        if (ShouldChasePlayer())
-        {
-            ChasePlayer();
-        }
-        else
-        {
-            Patrol();
-        }
+        HandleMovement();
     }
 
-    void CheckForPlayer()
+    void HandleMovement()
     {
-        Collider[] colliders = Physics.OverlapSphere(
-            transform.position, 
-            enemyPatrolDistance, 
-            playerLayerMask
-        );
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
 
-        foreach (Collider collider in colliders)
+        Vector3 movement = new Vector3(horizontal, 0, vertical) * moveSpeed;
+        _rb.velocity = movement;
+    }
+
+    [PunRPC]
+    public void TakeDamageRPC(int damage)
+    {
+        // Сетевая логика урона
+        if (_photonView != null && _photonView.IsMine)
         {
-            if (collider.CompareTag("Player"))
+            Health -= damage;
+            if (Health <= 0)
             {
-                patrolIntoPlayer = collider.gameObject;
-                return;
+                DestroyNetworkObject();
             }
         }
-        patrolIntoPlayer = null;
     }
 
-    bool ShouldChasePlayer()
+    void DestroyNetworkObject()
     {
-        return patrolIntoPlayer != null 
-            && Vector3.Distance(transform.position, patrolIntoPlayer.transform.position) <= enemyPatrolDistance;
-    }
-
-    void ChasePlayer()
-    {
-        Vector3 targetPosition = patrolIntoPlayer.transform.position;
-        targetPosition.y = transform.position.y; // Фиксируем Y, чтобы враг не поднимался и не опускался
-
-        Vector3 direction = (targetPosition - transform.position).normalized;
-        rb.velocity = direction * enemySpeed; // Двигаем врага через физику
-
-        LookAtTarget(targetPosition);
-    }
-
-    void Patrol()
-    {
-        Transform targetPoint = patrolPoints[currentPointIndex];
-        Vector3 targetPosition = targetPoint.position;
-        targetPosition.y = transform.position.y; // Оставляем текущую высоту
-
-        Vector3 direction = (targetPosition - transform.position).normalized;
-        rb.velocity = direction * enemySpeed; // Двигаем врага через физику
-
-        LookAtTarget(targetPosition);
-
-        if (Vector3.Distance(transform.position, targetPoint.position) < 0.5f)
+        if (_photonView != null && _photonView.IsMine)
         {
-            currentPointIndex = (currentPointIndex + 1) % patrolPoints.Length;
+            PhotonNetwork.Destroy(gameObject);
         }
     }
 
-    void LookAtTarget(Vector3 targetPosition)
+    void OnDestroy()
     {
-        Vector3 direction = targetPosition - transform.position;
-        direction.y = 0; // Убираем наклон по оси Y
+        // Очистка ссылок
+        _photonView = null;
+        _rb = null;
 
-        if (direction != Vector3.zero)
+        // Дополнительные действия при уничтожении
+        if (PhotonNetwork.IsConnected)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
+            PhotonNetwork.RemoveRPCs(_photonView);
+        }
+    }
+
+    // Пример свойства с проверкой
+    private int _health = 100;
+    public int Health
+    {
+        get => _health;
+        set
+        {
+            if (_photonView != null && _photonView.IsMine)
+            {
+                _health = Mathf.Clamp(value, 0, 100);
+            }
         }
     }
 }
