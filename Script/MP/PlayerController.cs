@@ -78,6 +78,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     private float airTime = 0f; // сколько времени игрок находится в воздухе
     private bool wasGrounded = true; // для отслеживания перехода из состояния "на земле"
 
+
+
+    UniversalSoundPlayer playerSound;
     private void Awake()
     {
         soundGod = FindObjectOfType<SoundGodScript>();
@@ -91,6 +94,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
         playerManager = PhotonView.Find((int)pnView.InstantiationData[0])
             .GetComponent<PlayerManager>();
+
+        playerSound = GetComponent<UniversalSoundPlayer>();
     }
 
     private void Start()
@@ -224,10 +229,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         // Обработка прыжка и гравитации:
         if (characterController.isGrounded)
         {
+            playerSound.PlaySound(true, soundGod.GetSound("PlayerSound", "PlayerLanded"));
             // Если нажата клавиша прыжка, устанавливаем вертикальную скорость
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 verticalVelocity = jumpForce;
+                playerSound.PlaySound(true, soundGod.GetSound("PlayerSound", "PlayerJump"));
             }
             else
             {
@@ -245,6 +252,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         moveAmount.y = verticalVelocity;
 
         characterController.Move(moveAmount * Time.deltaTime);
+
+        
+
     }
 
     private void UseItem()
