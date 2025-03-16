@@ -59,3 +59,31 @@ MonoBehaviour:
       clip: {fileID: 8300000, guid: e16f8c91a8df7b9499f471d701c879de, type: 3}
     - soundType: PistolShoot
       clip: {fileID: 8300000, guid: ee7844c8347ceba41b86ad4a97eba3f6, type: 3}
+  - categoryName: PrimaryAttackSounds
+    sounds:
+    - soundType: AutoEmpty
+      clip: {fileID: 8300000, guid: 4ea0337da8007ab47bf64a82edeb79b4, type: 3}
+    - soundType: AutoReload
+      clip: {fileID: 8300000, guid: f1c88757b2ea1a042bf158f1cf79d92c, type: 3}
+    - soundType: AutoShoot
+      clip: {fileID: 8300000, guid: 2e38b2a7bb4428144b3948784f823040, type: 3}
+    - soundType: PistolEmpty
+      clip: {fileID: 8300000, guid: 4d0f93ade97ff8b4e99b7a79ce460625, type: 3}
+    - soundType: PistolReload
+      clip: {fileID: 8300000, guid: e16f8c91a8df7b9499f471d701c879de, type: 3}
+    - soundType: PistolShoot
+      clip: {fileID: 8300000, guid: ee7844c8347ceba41b86ad4a97eba3f6, type: 3}
+  - categoryName: PlayerWeapon
+    sounds:
+    - soundType: AutoEmpty
+      clip: {fileID: 8300000, guid: 4ea0337da8007ab47bf64a82edeb79b4, type: 3}
+    - soundType: AutoReload
+      clip: {fileID: 8300000, guid: f1c88757b2ea1a042bf158f1cf79d92c, type: 3}
+    - soundType: AutoShoot
+      clip: {fileID: 8300000, guid: 2e38b2a7bb4428144b3948784f823040, type: 3}
+    - soundType: PistolEmpty
+      clip: {fileID: 8300000, guid: 4d0f93ade97ff8b4e99b7a79ce460625, type: 3}
+    - soundType: PistolReload
+      clip: {fileID: 8300000, guid: e16f8c91a8df7b9499f471d701c879de, type: 3}
+    - soundType: PistolShoot
+      clip: {fileID: 8300000, guid: ee7844c8347ceba41b86ad4a97eba3f6, type: 3}
