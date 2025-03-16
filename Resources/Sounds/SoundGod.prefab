@@ -59,3 +59,9 @@ MonoBehaviour:
       clip: {fileID: 8300000, guid: e16f8c91a8df7b9499f471d701c879de, type: 3}
     - soundType: PistolShoot
       clip: {fileID: 8300000, guid: ee7844c8347ceba41b86ad4a97eba3f6, type: 3}
+  - categoryName: PlayerSound
+    sounds:
+    - soundType: PlayerJump
+      clip: {fileID: 8300000, guid: a660286049fcb0a4389066f1f31b7fc8, type: 3}
+    - soundType: PlayerLanded
+      clip: {fileID: 8300000, guid: b16dc74b7376aca46bd0c6be96c940fa, type: 3}
