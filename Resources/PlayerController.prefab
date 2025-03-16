@@ -1939,6 +1939,8 @@ MonoBehaviour:
   autoFireRate: 10
   gravity: -9.81
   bobbingSmoothSpeed: 5
+  landingShakeDuration: 0.3
+  maxLandingShakeMagnitude: 0.3
   shieldActive: 0
 --- !u!114 &4529711545312793024
 MonoBehaviour:
