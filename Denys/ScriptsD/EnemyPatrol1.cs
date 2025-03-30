@@ -1,50 +1,93 @@
 using UnityEngine;
-using System.Collections;
 using UnityEngine.AI;
 
 public class EnemyPatrol1 : MonoBehaviour
 {
-    // Компонент агента
-    UnityEngine.AI.NavMeshAgent agent;
-    // Массив положений точек назначения
+    private NavMeshAgent agent;
     public Transform[] goals;
-    // Расстояние на которое необходимо приблизиться к точке
-    public float distanceToChangeGoal;
-    // Номер текущей целевой точки
-    int currentGoal = 0;
-    CharacterController charCtrl;
-    public GameObject player;
-    public float chaseDistance = 5f; // Радиус преследования
-    private NavMeshAgent nMesh; 
+    public float distanceToChangeGoal = 1f;
+    private int currentGoal = 0;
+    public float chaseDistance = 5f; // Радиус обнаружения игрока
+    public float stoppingDistance = 1.5f; // Расстояние остановки от игрока
+    public LayerMask playerLayer;
+
+    private Transform player;
+    private bool isChasing = false;
 
     void Start()
     {
-        // Сохранение компонента агента и направление к первой точке
         agent = GetComponent<NavMeshAgent>();
-        agent.destination = goals[0].position;
-        player = GameObject.FindGameObjectWithTag("Player");
+        agent.stoppingDistance = stoppingDistance;
+        SetClosestGoal();
     }
 
     void Update()
     {
-        Debug.Log(agent.speed);
-        if (player == null) return;
+        DetectPlayer();
 
-        float playerDistance = Vector3.Distance(transform.position, player.transform.position);
-
-        // Если игрок в радиусе, меняем точку назначения на игрока
-        if (playerDistance < chaseDistance)
+        if (isChasing && player != null)
         {
-            agent.destination = player.transform.position;
-            agent.speed = agent.speed + 2f;
+            float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+            if (distanceToPlayer > stoppingDistance)
+            {
+                agent.destination = player.position;
+            }
+            else
+            {
+                agent.ResetPath(); // Останавливаем врага перед игроком
+            }
         }
-        // Если враг не преследует игрока, то патрулирует по точкам
-        else if (agent.remainingDistance < distanceToChangeGoal)
+        else
         {
-            // Смена точки на следующую
-            currentGoal++;
-            if (currentGoal >= goals.Length) currentGoal = 0;
+            Patrol();
+        }
+    }
+
+    void DetectPlayer()
+    {
+        Collider[] colliders = Physics.OverlapSphere(transform.position, chaseDistance, playerLayer);
+        if (colliders.Length > 0)
+        {
+            player = colliders[0].transform;
+            isChasing = true;
+        }
+        else
+        {
+            isChasing = false;
+        }
+    }
+
+    void Patrol()
+    {
+        if (agent.remainingDistance < distanceToChangeGoal || !agent.hasPath)
+        {
+            currentGoal = (currentGoal + 1) % goals.Length;
             agent.destination = goals[currentGoal].position;
         }
+    }
+
+    void SetClosestGoal()
+    {
+        float minDistance = Mathf.Infinity;
+        int closestIndex = 0;
+
+        for (int i = 0; i < goals.Length; i++)
+        {
+            float distance = Vector3.Distance(transform.position, goals[i].position);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                closestIndex = i;
+            }
+        }
+
+        currentGoal = closestIndex;
+        agent.destination = goals[currentGoal].position;
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, chaseDistance);
     }
 }
