@@ -1,6 +1,6 @@
 using System.Collections;
 using UnityEngine;
-
+using UnityEngine.AI;
 public class EnemyPatrol : MonoBehaviour
 {
     [SerializeField] private float enemySpeed = 3f;
@@ -11,10 +11,12 @@ public class EnemyPatrol : MonoBehaviour
     [SerializeField] private LayerMask groundLayerMask;
     
     private int currentPointIndex = 0;
-    private Transform[] patrolPoints;
+    public Transform[] patrolPoints;
     private Rigidbody rb;
     private GameObject player;
 
+
+    NavMeshAgent agent;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -22,6 +24,8 @@ public class EnemyPatrol : MonoBehaviour
 
         InitializePatrolPoints();
         StartCoroutine(FindPlayerWhenAvailable());
+
+        NavMeshAgent agent = GetComponent<NavMeshAgent>();
     }
 
     void InitializePatrolPoints()
@@ -118,8 +122,8 @@ public class EnemyPatrol : MonoBehaviour
         Vector3 targetPosition = targetPoint.position;
         targetPosition.y = transform.position.y; // Фиксируем Y
 
-        MoveTowards(targetPosition);
-
+        //MoveTowards(targetPosition);
+        agent.destination = targetPosition;
         // Проверяем, достигли ли точки патрулирования
         if (Vector3.Distance(transform.position, targetPosition) < patrolStoppingDistance)
         {
