@@ -27,6 +27,7 @@ public class EnemyPatrol1 : MonoBehaviour
 
     void Update()
     {
+        Debug.Log(agent.speed);
         if (player == null) return;
 
         float playerDistance = Vector3.Distance(transform.position, player.transform.position);
@@ -35,7 +36,7 @@ public class EnemyPatrol1 : MonoBehaviour
         if (playerDistance < chaseDistance)
         {
             agent.destination = player.transform.position;
-            agent.Speed = agent.Speed + 2;
+            agent.speed = agent.speed + 2f;
         }
         // Если враг не преследует игрока, то патрулирует по точкам
         else if (agent.remainingDistance < distanceToChangeGoal)

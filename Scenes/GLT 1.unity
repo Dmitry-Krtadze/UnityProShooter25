@@ -1480,9 +1480,9 @@ MonoBehaviour:
   - {fileID: 612685322}
   - {fileID: 55719743}
   - {fileID: 601751960}
-  distanceToChangeGoal: 1
+  distanceToChangeGoal: 2
   player: {fileID: 0}
-  chaseDistance: 5
+  chaseDistance: 6
 --- !u!1 &288922602
 GameObject:
   m_ObjectHideFlags: 0
