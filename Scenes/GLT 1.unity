@@ -4605,6 +4605,14 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3c6eb8f7c46bcb94b9e2cf7f8375b245, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1495186693306743793, guid: 3c6eb8f7c46bcb94b9e2cf7f8375b245, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: ffd19ad2f09725f4c88fd48c23bd0f1b, type: 2}
     - target: {fileID: 1822114813590617255, guid: 3c6eb8f7c46bcb94b9e2cf7f8375b245, type: 3}
       propertyPath: m_Layer
       value: 7
@@ -4706,7 +4714,7 @@ Animator:
   m_GameObject: {fileID: 824999329}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: c52df65ef1cda994fb4c86681ceacfae, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -13427,7 +13435,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4936445700026697822, guid: 97c1d44894113db4ba2d2b6d336b41b9, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5984607719635254568, guid: 97c1d44894113db4ba2d2b6d336b41b9, type: 3}
       propertyPath: goals.Array.data[0]
@@ -13452,6 +13460,18 @@ PrefabInstance:
     - target: {fileID: 5984607719635254571, guid: 97c1d44894113db4ba2d2b6d336b41b9, type: 3}
       propertyPath: sceneViewId
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6661878657976813155, guid: 97c1d44894113db4ba2d2b6d336b41b9, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 41cd09793fdb0c3428da205696d9bf62, type: 2}
+    - target: {fileID: 7217172641819817725, guid: 97c1d44894113db4ba2d2b6d336b41b9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.010511902
+      objectReference: {fileID: 0}
+    - target: {fileID: 7217172641819817725, guid: 97c1d44894113db4ba2d2b6d336b41b9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.0020756721
       objectReference: {fileID: 0}
     - target: {fileID: 8164704194045078380, guid: 97c1d44894113db4ba2d2b6d336b41b9, type: 3}
       propertyPath: m_RootOrder
