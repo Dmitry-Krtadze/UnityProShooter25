@@ -1,156 +1,106 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+
 public class EnemyPatrol : MonoBehaviour
 {
-    [SerializeField] private float enemySpeed = 3f;
-    [SerializeField] private float acceleration = 10f;
-    [SerializeField] private float patrolStoppingDistance = 0.5f;
-    [SerializeField] private float patrolDetectionRange = 6f;
-    [SerializeField] private LayerMask playerLayerMask;
-    [SerializeField] private LayerMask groundLayerMask;
-    
-    private int currentPointIndex = 0;
-    public Transform[] patrolPoints;
-    private Rigidbody rb;
-    private GameObject player;
+    private NavMeshAgent agent;
+    public Transform[] goals;
+    Animator en_Animator;
+    public float distanceToChangeGoal = 1f;
+    private int currentGoal = 0;
+    public float chaseDistance = 5f; // Р Р°РґРёСѓСЃ РѕР±РЅР°СЂСѓР¶РµРЅРёСЏ РёРіСЂРѕРєР°
+    public float stoppingDistance = 1.5f; // Р Р°СЃСЃС‚РѕСЏРЅРёРµ РѕСЃС‚Р°РЅРѕРІРєРё РѕС‚ РёРіСЂРѕРєР°
+    public LayerMask playerLayer;
 
+    private Transform player;
+    private bool isChasing = false;
 
-    NavMeshAgent agent;
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        rb.freezeRotation = true;
-
-        InitializePatrolPoints();
-        StartCoroutine(FindPlayerWhenAvailable());
-
-        NavMeshAgent agent = GetComponent<NavMeshAgent>();
+        agent = GetComponent<NavMeshAgent>();
+        agent.stoppingDistance = stoppingDistance;
+        agent.speed = 2f;
+        SetClosestGoal();
+        en_Animator = gameObject.GetComponent<Animator>();
+        en_Animator.SetBool("IsWalk", true);
     }
 
-    void InitializePatrolPoints()
+    void Update()
     {
-        GameObject[] points = GameObject.FindGameObjectsWithTag("PatrolPoint");
-        if (points.Length == 0)
+        DetectPlayer();
+
+        if (isChasing && player != null)
         {
-            Debug.LogError("No patrol points found!");
-            return;
-        }
-
-        patrolPoints = new Transform[points.Length];
-        for (int i = 0; i < points.Length; i++)
-        {
-            patrolPoints[i] = points[i].transform;
-        }
-
-        transform.position = patrolPoints[0].position;
-    }
-
-    private IEnumerator FindPlayerWhenAvailable()
-    {
-        while (player == null)
-        {
-            player = GameObject.FindGameObjectWithTag("Player");
-            yield return new WaitForSeconds(0.1f);
-        }
-    }
-
-    void FixedUpdate()
-    {
-        if (patrolPoints == null || patrolPoints.Length == 0) return;
-
-        CheckForPlayer();
-
-        // Проверка на землю (Default Layer)
-        bool isGrounded = Physics.SphereCast(transform.position, 0.3f, Vector3.down, out _, 1.1f, groundLayerMask);
-
-        if (!isGrounded)
-        {
-            rb.AddForce(Vector3.down * 20f, ForceMode.Acceleration); // Притягиваем к земле
-        }
-        else
-        {
-            rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z); // Фиксируем на земле
-        }
-
-        if (ShouldChasePlayer())
-        {
-            ChasePlayer();
+            float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+            if (distanceToPlayer > stoppingDistance)
+            {
+                agent.destination = player.position;
+                agent.speed = 5f;
+                en_Animator.SetBool("IsWalk", false);
+                en_Animator.SetBool("IsRun", true);
+            }
+            else
+            {
+                //agent.ResetPath(); // РћСЃС‚Р°РЅР°РІР»РёРІР°РµРј РІСЂР°РіР° РїРµСЂРµРґ РёРіСЂРѕРєРѕРј
+                en_Animator.SetTrigger("IsAttack");
+            }
         }
         else
         {
             Patrol();
+            agent.speed = 2f;
+            en_Animator.SetBool("IsRun", false);
+            en_Animator.SetBool("IsWalk", true);
         }
     }
 
-    void CheckForPlayer()
+    void DetectPlayer()
     {
-        Collider[] colliders = Physics.OverlapSphere(transform.position, patrolDetectionRange, playerLayerMask);
-
-        foreach (Collider collider in colliders)
+        Collider[] colliders = Physics.OverlapSphere(transform.position, chaseDistance, playerLayer);
+        if (colliders.Length > 0)
         {
-            if (collider.CompareTag("Player"))
-            {
-                player = collider.gameObject;
-                return;
-            }
+            player = colliders[0].transform;
+            isChasing = true;
         }
-        player = null;
-    }
-
-    bool ShouldChasePlayer()
-    {
-        return player != null && Vector3.Distance(transform.position, player.transform.position) > patrolStoppingDistance;
-    }
-
-    void ChasePlayer()
-    {
-        if (player == null) return;
-
-        Vector3 targetPosition = player.transform.position;
-        targetPosition.y = transform.position.y; // Фиксируем Y
-        Vector3 direction = (targetPosition - transform.position).normalized;
-
-        rb.AddForce(direction * acceleration, ForceMode.Acceleration);
-
-        LookAtTarget(targetPosition);
+        else
+        {
+            isChasing = false;
+        }
     }
 
     void Patrol()
     {
-        Transform targetPoint = patrolPoints[currentPointIndex];
-        Vector3 targetPosition = targetPoint.position;
-        targetPosition.y = transform.position.y; // Фиксируем Y
-
-        //MoveTowards(targetPosition);
-        agent.destination = targetPosition;
-        // Проверяем, достигли ли точки патрулирования
-        if (Vector3.Distance(transform.position, targetPosition) < patrolStoppingDistance)
+        if (agent.remainingDistance < distanceToChangeGoal || !agent.hasPath)
         {
-            currentPointIndex = (currentPointIndex + 1) % patrolPoints.Length; // Переход к следующей точке
+            currentGoal = (currentGoal + 1) % goals.Length;
+            agent.speed = 0f;
+            en_Animator.SetBool("IsWalk", false);
+            agent.destination = goals[currentGoal].position;
         }
     }
 
-    void MoveTowards(Vector3 targetPosition)
+    void SetClosestGoal()
     {
-        Vector3 direction = (targetPosition - transform.position).normalized;
-        rb.AddForce(direction * acceleration, ForceMode.Acceleration);
-        
-        // Ограничение скорости, чтобы враг не разгонялся бесконечно
-        rb.velocity = Vector3.ClampMagnitude(rb.velocity, enemySpeed);
+        float minDistance = Mathf.Infinity;
+        int closestIndex = 0;
 
-        LookAtTarget(targetPosition);
+        for (int i = 0; i < goals.Length; i++)
+        {
+            float distance = Vector3.Distance(transform.position, goals[i].position);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                closestIndex = i;
+            }
+        }
+
+        currentGoal = closestIndex;
+        agent.destination = goals[currentGoal].position;
     }
 
-    void LookAtTarget(Vector3 targetPosition)
+    void OnDrawGizmosSelected()
     {
-        Vector3 direction = targetPosition - transform.position;
-        direction.y = 0;
-
-        if (direction != Vector3.zero)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
-        }
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, chaseDistance);
     }
 }
