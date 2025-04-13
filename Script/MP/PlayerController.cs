@@ -217,10 +217,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         }
         wasGrounded = characterController.isGrounded;
     }
-
+    bool isJump;
     // Объединяем логику горизонтального движения и прыжка
     private void Movement()
     {
+        
         // Получаем горизонтальное направление ввода
         Vector3 inputDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
         float targetSpeed = Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed;
@@ -229,11 +230,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         // Обработка прыжка и гравитации:
         if (characterController.isGrounded)
         {
-            playerSound.PlaySound(true, soundGod.GetSound("PlayerSound", "PlayerLanded"));
+            if (isJump)
+            {
+                playerSound.PlaySound(true, soundGod.GetSound("PlayerSound", "PlayerLanded"));
+            }
+            isJump = false;
             // Если нажата клавиша прыжка, устанавливаем вертикальную скорость
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 verticalVelocity = jumpForce;
+                isJump = true;
                 playerSound.PlaySound(true, soundGod.GetSound("PlayerSound", "PlayerJump"));
             }
             else
