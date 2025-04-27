@@ -13695,6 +13695,38 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2813288299697732731, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
+      propertyPath: spawnPoints.Array.size
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2813288299697732731, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
+      propertyPath: spawnPoints.Array.data[0]
+      value: 
+      objectReference: {fileID: 815419270}
+    - target: {fileID: 2813288299697732731, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
+      propertyPath: spawnPoints.Array.data[1]
+      value: 
+      objectReference: {fileID: 1598644048}
+    - target: {fileID: 2813288299697732731, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
+      propertyPath: spawnPoints.Array.data[2]
+      value: 
+      objectReference: {fileID: 496632626}
+    - target: {fileID: 2813288299697732731, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
+      propertyPath: spawnPoints.Array.data[3]
+      value: 
+      objectReference: {fileID: 60148943}
+    - target: {fileID: 2813288299697732731, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
+      propertyPath: spawnPoints.Array.data[4]
+      value: 
+      objectReference: {fileID: 1266980629}
+    - target: {fileID: 2813288299697732731, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
+      propertyPath: spawnPoints.Array.data[5]
+      value: 
+      objectReference: {fileID: 1218528788}
+    - target: {fileID: 2813288299697732731, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
+      propertyPath: spawnPoints.Array.data[6]
+      value: 
+      objectReference: {fileID: 547866324}
     - target: {fileID: 8259772742878324155, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
       propertyPath: m_Name
       value: SpawnerManager
