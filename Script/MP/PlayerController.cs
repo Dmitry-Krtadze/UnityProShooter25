@@ -295,7 +295,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             StartReload(currentItem);
         }
     }
-
     private void ExecuteShot(Item currentItem)
     {
         if (currentItem.currentAmmo > 0)
@@ -326,6 +325,32 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
                     pnView.RPC("RPC_SpawnMuzzleFlash", RpcTarget.All, activeMuzzle.position, activeMuzzle.rotation);
                 }
                 pnView.RPC("RPC_SpawnImpactEffect", RpcTarget.All, hit.point, hit.normal);
+
+                // >>> ТЕЛЕПОРТАЦИЯ ПО ПОПАДАНИЮ <<<
+                if (hit.collider.CompareTag("Teleport1"))
+                {
+                    GameObject teleport2 = GameObject.FindWithTag("Teleport2");
+                    if (teleport2 != null)
+                    {
+                        transform.position = teleport2.transform.position;
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Teleport2 не найден!");
+                    }
+                }
+                else if (hit.collider.CompareTag("Teleport2"))
+                {
+                    GameObject teleport1 = GameObject.FindWithTag("Teleport1");
+                    if (teleport1 != null)
+                    {
+                        transform.position = teleport1.transform.position;
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Teleport1 не найден!");
+                    }
+                }
             }
         }
         else
