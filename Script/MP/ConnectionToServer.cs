@@ -4,7 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using TMPro;
 using Photon.Realtime;
-
+using UnityEngine.SceneManagement;
 public class ConnectionToServer : MonoBehaviourPunCallbacks
 {
     public static ConnectionToServer Instance;
@@ -153,4 +153,28 @@ public class ConnectionToServer : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.LoadLevel(levelIndex);
     }
+
+    public void StartTutorial()
+    {
+        // Включаем OfflineMode, чтобы использовать локальную комнату
+        PhotonNetwork.OfflineMode = true;
+
+        // Создаем комнату с параметрами (в режиме OfflineMode)
+        RoomOptions roomOptions = new RoomOptions();
+        roomOptions.IsVisible = false;  // Комната будет невидимой
+        roomOptions.IsOpen = true;      // Комната будет открыта для подключения
+        roomOptions.MaxPlayers = 4;    // Максимум игроков
+
+        // Создаем комнату в OfflineMode
+        PhotonNetwork.CreateRoom("bibib", roomOptions, TypedLobby.Default);
+
+        // Задержка перед загрузкой сцены (например, 2 секунды)
+        Invoke("LoadSceneAfterDelay", 2f);
+    }
+    void LoadSceneAfterDelay()
+    {
+        Debug.Log("Загружаем сцену!");
+        SceneManager.LoadScene(2);
+    }
+
 }

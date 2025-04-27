@@ -316,7 +316,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             UpdateAmmoUI();
             GetComponentInChildren<WeaponKickback>().ApplyRecoil(weaponType);
 
-            // пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+            // Луч из текущей позиции и направления камеры
             Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
             if (Physics.Raycast(ray, out RaycastHit hit, range))
             {
@@ -326,8 +326,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
                 }
                 pnView.RPC("RPC_SpawnImpactEffect", RpcTarget.All, hit.point, hit.normal);
 
-                // >>> ТЕЛЕПОРТАЦИЯ ПО ПОПАДАНИЮ <<<
-                if (hit.collider.CompareTag("Teleport1"))
+                // >>> Реакция на попадание в мишень
+                if (hit.collider.CompareTag("Target"))  // Проверяем, попали ли в мишень
+                {
+                    Target target = hit.collider.GetComponent<Target>();  // Получаем компонент мишени
+                    if (target != null)
+                    {
+                        target.OnHit();  // Вызываем метод OnHit, чтобы мишень отреагировала
+                    }
+                }
+
+                // >>> Реакция на телепортацию
+                else if (hit.collider.CompareTag("Teleport1"))
                 {
                     GameObject teleport2 = GameObject.FindWithTag("Teleport2");
                     if (teleport2 != null)
@@ -365,6 +375,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             }
         }
     }
+
 
     [PunRPC]
     void RPC_SpawnMuzzleFlash(Vector3 position, Quaternion rotation)
