@@ -8,26 +8,26 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 {
-    // Переменные для перемещения, камеры
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ
     [SerializeField] public GameObject playerCamera;
     [SerializeField] private float walkSpeed, sprintSpeed, mouseSensitivity, jumpForce, smoothTime;
     private float verticalLookRotation;
     [SerializeField] private bool isGround = true;
-    private Vector3 moveAmount; // Общая скорость, включая вертикальную составляющую
+    private Vector3 moveAmount; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     public PhotonView pnView;
 
-    // Используем CharacterController вместо Rigidbody
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ CharacterController пїЅпїЅпїЅпїЅпїЅпїЅ Rigidbody
     private CharacterController characterController;
 
-    // Массив для оружия
+    // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
     [SerializeField] Item[] items;
     private int itemIndex;
     private int prevItemIndex = -1;
 
-    // Переменные для хп
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ
     [SerializeField] private float maxHealth = 100f;
     [SerializeField] private float currentHealth;
-    // Хп-бар сверху игрока
+    // пїЅпїЅ-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
     [SerializeField] Slider hpBar;
 
     private PlayerManager playerManager;
@@ -46,37 +46,37 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     LeaderBoardManager LeaderBoardManager;
     LeaderboardUI LeaderboardUI;
 
-    [SerializeField] private float bobbingSpeed = 7f;      // Скорость пошатывания
-    [SerializeField] private float bobbingAmountY = 0.05f;   // Амплитуда пошатывания вверх-вниз
-    [SerializeField] private float bobbingAmountX = 0.03f;   // Амплитуда пошатывания влево-вправо
-    [SerializeField] private float sprintMultiplier = 1.8f;  // Ускорение при спринте
+    [SerializeField] private float bobbingSpeed = 7f;      // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    [SerializeField] private float bobbingAmountY = 0.05f;   // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅ
+    [SerializeField] private float bobbingAmountX = 0.03f;   // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅ
+    [SerializeField] private float sprintMultiplier = 1.8f;  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     private float defaultCamPosY;
     private float defaultCamPosX;
     private float bobbingTimer = 0f;
     private bool isSprinting => Input.GetKey(KeyCode.LeftShift) && (new Vector3(moveAmount.x, 0, moveAmount.z).magnitude > 0.1f);
 
-    // Новые переменные для эффектов выстрела
+    // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     [SerializeField] private GameObject muzzleFlashPrefab;
     [SerializeField] private GameObject[] impactEffectPrefabs;
     [SerializeField] private GameObject bulletHolePrefab;
     [SerializeField] private float range = 100f;
     private Transform activeMuzzle;
 
-    [SerializeField] private float autoFireRate = 6f; // количество выстрелов в секунду
+    [SerializeField] private float autoFireRate = 6f; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     private float nextFireTime = 0f;
 
-    // Параметры прыжка и гравитации
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     private float verticalVelocity;
     [SerializeField] private float gravity = -9.81f;
     [SerializeField] private float bobbingSmoothSpeed = 5f;
 
 
-    [SerializeField] private float landingShakeDuration = 0.3f; // базовая длительность тряски при приземлении
-    [SerializeField] private float maxLandingShakeMagnitude = 0.3f; // максимальное смещение камеры при длинном полете
+    [SerializeField] private float landingShakeDuration = 0.3f; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    [SerializeField] private float maxLandingShakeMagnitude = 0.3f; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
     private float landingShakeTimer = 0f;
     private float landingShakeMagnitude = 0f;
-    private float airTime = 0f; // сколько времени игрок находится в воздухе
-    private bool wasGrounded = true; // для отслеживания перехода из состояния "на земле"
+    private float airTime = 0f; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    private bool wasGrounded = true; // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ"
 
 
 
@@ -85,7 +85,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     {
         soundGod = FindObjectOfType<SoundGodScript>();
         pnView = GetComponent<PhotonView>();
-        // Получаем CharacterController (убедитесь, что он добавлен к объекту)
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ CharacterController (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
         characterController = GetComponent<CharacterController>();
 
         currentHealth = maxHealth;
@@ -103,7 +103,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         if (!pnView.IsMine)
         {
             Destroy(playerCamera);
-            // Отключаем управление для чужих игроков
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             if (ammoText != null) ammoText.gameObject.SetActive(false);
             if (hpBarPlayer != null) hpBarPlayer.gameObject.SetActive(false);
         }
@@ -160,7 +160,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             return;
 
         Look();
-        Movement(); // Обрабатываем движение и прыжок в одном методе
+        Movement(); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
         SelectWeapon();
 
         if (!isReloading)
@@ -208,8 +208,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         {
             if (!wasGrounded)
             {
-                // Игрок только что приземлился:
-                // Чем дольше в воздухе, тем сильнее эффект (с ограничением)
+                // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
+                // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
                 landingShakeMagnitude = Mathf.Lerp(0f, maxLandingShakeMagnitude, Mathf.Clamp01(airTime / 2f));
                 landingShakeTimer = landingShakeDuration;
                 airTime = 0f;
@@ -220,15 +220,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
     bool isJump;
 
-    // Объединяем логику горизонтального движения и прыжка
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
     private void Movement()
     {
-        // Получаем горизонтальное направление ввода
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
         Vector3 inputDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
         float targetSpeed = Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed;
         Vector3 horizontalMove = transform.TransformDirection(inputDir) * targetSpeed;
 
-        // Обработка прыжка и гравитации:
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
         if (characterController.isGrounded)
         {
             if (isJump)
@@ -237,7 +237,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
                 playerSound.PlaySound(true, soundGod.GetSound("PlayerSound", "PlayerLanded"));
             }
             isJump = false;
-            // Если нажата клавиша прыжка, устанавливаем вертикальную скорость
+            // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             if (Input.GetKeyDown(KeyCode.Space))
 
             {
@@ -247,7 +247,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             }
             else
             {
-                // Если на земле, устанавливаем небольшое отрицательное значение для "прилипания"
+                // пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"
                 verticalVelocity = -1f;
             }
         }
@@ -256,7 +256,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             verticalVelocity += gravity * Time.deltaTime;
         }
 
-        // Объединяем горизонтальную и вертикальную составляющие
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         moveAmount = horizontalMove;
         moveAmount.y = verticalVelocity;
 
@@ -271,7 +271,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         Item currentItem = items[itemIndex];
         if (isReloading || currentItem.isReloading) return;
 
-        // Для пистолета – одиночный выстрел
+        // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (currentItem.weaponType == "Pistol")
         {
             if (Input.GetMouseButtonDown(0))
@@ -280,7 +280,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
                 LeaderBoardManager.Instance.photonView.RPC("RPC_AddScore", RpcTarget.MasterClient, PhotonNetwork.NickName, 1);
             }
         }
-        // Для автомата – очередной выстрел при удержании кнопки
+        // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
         else if (currentItem.weaponType == "AK47")
         {
             if (Input.GetMouseButton(0) && Time.time >= nextFireTime)
@@ -316,7 +316,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             UpdateAmmoUI();
             GetComponentInChildren<WeaponKickback>().ApplyRecoil(weaponType);
 
-            // Луч из текущей позиции и направления камеры
+            // пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
             Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
             if (Physics.Raycast(ray, out RaycastHit hit, range))
             {
@@ -409,6 +409,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     {
         pnView.RPC("RPC_Damage", RpcTarget.Others, damage, attacker);
     }
+
+    [PunRPC]
+void RPC_KillZone(float damage, string attacker)
+{
+    LeaderBoardManager.Instance.photonView.RPC("RPC_AddDeath", RpcTarget.MasterClient, PhotonNetwork.NickName);
+    LeaderBoardManager.Instance.photonView.RPC("RPC_AddKill", RpcTarget.MasterClient, attacker);
+    playerManager.Die();
+}
 
     [PunRPC]
     void RPC_Damage(float damage, string attacker)
@@ -564,7 +572,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
 
     private void CameraBobbing()
     {
-        // Рассчитываем базовый эффект боббинга (используем только горизонтальное движение)
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
         Vector3 horizontalMove = new Vector3(moveAmount.x, 0, moveAmount.z);
         Vector3 targetPos;
         if (horizontalMove.magnitude > 0.1f && characterController.isGrounded)
@@ -584,7 +592,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             targetPos = new Vector3(defaultCamPosX, defaultCamPosY, playerCamera.transform.localPosition.z);
         }
 
-        // Если есть эффект приземления, добавляем случайное смещение
+        // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (landingShakeTimer > 0)
         {
             Vector3 landingShakeOffset = new Vector3(
@@ -595,7 +603,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             landingShakeTimer -= Time.deltaTime;
         }
 
-        // Плавно интерполируем положение камеры к целевому значению
+        // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         float smoothX = Mathf.Lerp(playerCamera.transform.localPosition.x, targetPos.x, Time.deltaTime * 5f);
         float smoothY = Mathf.Lerp(playerCamera.transform.localPosition.y, targetPos.y, Time.deltaTime * 5f);
         playerCamera.transform.localPosition = new Vector3(smoothX, smoothY, targetPos.z);
