@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections;
 
 public class EnemyPatrol : MonoBehaviour
 {
@@ -11,6 +12,8 @@ public class EnemyPatrol : MonoBehaviour
     public float chaseDistance = 5f; // Радиус обнаружения игрока
     public float stoppingDistance = 1.5f; // Расстояние остановки от игрока
     public LayerMask playerLayer;
+
+    public float stopTime = 1.5f; // Публичная переменная для времени остановки, по умолчанию 1.5 секунды
 
     private Transform player;
     private bool isChasing = false;
@@ -28,7 +31,8 @@ public class EnemyPatrol : MonoBehaviour
     void Update()
     {
         DetectPlayer();
-
+        float currentSpeed = agent.velocity.magnitude;
+        en_Animator.SetFloat("Speed", currentSpeed);
         if (isChasing && player != null)
         {
             float distanceToPlayer = Vector3.Distance(transform.position, player.position);
@@ -41,7 +45,6 @@ public class EnemyPatrol : MonoBehaviour
             }
             else
             {
-                //agent.ResetPath(); // Останавливаем врага перед игроком
                 en_Animator.SetTrigger("IsAttack");
             }
         }
@@ -72,11 +75,30 @@ public class EnemyPatrol : MonoBehaviour
     {
         if (agent.remainingDistance < distanceToChangeGoal || !agent.hasPath)
         {
+            Transform nextGoal = goals[currentGoal];
             currentGoal = (currentGoal + 1) % goals.Length;
-            agent.speed = 0f;
-            en_Animator.SetBool("IsWalk", false);
-            agent.destination = goals[currentGoal].position;
+
+            // Если следующая цель - это патрульная точка, добавляем задержку
+            if (goals[currentGoal] != player)
+            {
+                StartCoroutine(PauseBeforeNextGoal());
+            }
+            else
+            {
+                // Если цель - это игрок, сразу меняем на него
+                agent.destination = player.position;
+            }
         }
+    }
+
+    IEnumerator PauseBeforeNextGoal()
+    {
+        // Ожидаем время остановки
+        yield return new WaitForSeconds(stopTime);
+
+        // После паузы меняем точку и включаем анимацию движения
+        agent.destination = goals[currentGoal].position;
+        agent.speed = 2f;
     }
 
     void SetClosestGoal()
