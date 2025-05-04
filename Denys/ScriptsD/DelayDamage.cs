@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DelayDamage : MonoBehaviour
 {
-	public int zooDamage = 25;
+	public int zombDamage = 15;
 
 	void OnTriggerEnter(Collider other){
 		if (other.gameObject.CompareTag("Player"))

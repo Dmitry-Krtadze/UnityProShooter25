@@ -13833,6 +13833,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 494a644a1d5c11b42845347af73bfe73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  zooDamage: 15
 --- !u!114 &8966976769149712977
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13845,3 +13846,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 494a644a1d5c11b42845347af73bfe73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  zooDamage: 15
