@@ -9,7 +9,7 @@ public class DelayDamage : MonoBehaviour
 	void OnTriggerEnter(Collider other){
 		if (other.gameObject.CompareTag("Player"))
         {
-            other.gameObject.GetComponent<PlayerController>().TakeDamage(zooDamage, "Zombie", true);
+            other.gameObject.GetComponent<PlayerController>().TakeDamage(zombDamage, "Zombie", true);
         }
 	}
 }
