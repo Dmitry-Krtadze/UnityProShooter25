@@ -416,13 +416,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         LeaderBoardManager.SyncLeaderboard();
     }
 
-    public void TakeDamage(float damage, string attacker)
+    public void TakeDamage(float damage, string attacker, bool isMob)
     {
-        pnView.RPC("RPC_Damage", RpcTarget.Others, damage, attacker);
-    }
 
+        pnView.RPC("RPC_Damage", RpcTarget.Others, damage, attacker, isMob);
+        
+        
+    }
+    
     [PunRPC]
-void RPC_KillZone(float damage, string attacker)
+    void RPC_KillZone(float damage, string attacker)
 {
     LeaderBoardManager.Instance.photonView.RPC("RPC_AddDeath", RpcTarget.MasterClient, PhotonNetwork.NickName);
     LeaderBoardManager.Instance.photonView.RPC("RPC_AddKill", RpcTarget.MasterClient, attacker);
@@ -430,20 +433,23 @@ void RPC_KillZone(float damage, string attacker)
 }
 
     [PunRPC]
-    void RPC_Damage(float damage, string attacker)
+    void RPC_Damage(float damage, string attacker, bool isMob)
     {
         if (!pnView.IsMine) return;
 
         currentHealth -= damage;
         hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
         Debug.Log(attacker);
-
-        if (currentHealth <= 0)
+        if (!isMob)
         {
-            LeaderBoardManager.Instance.photonView.RPC("RPC_AddDeath", RpcTarget.MasterClient, PhotonNetwork.NickName);
-            LeaderBoardManager.Instance.photonView.RPC("RPC_AddKill", RpcTarget.MasterClient, attacker);
-            playerManager.Die();
+            if (currentHealth <= 0)
+            {
+                LeaderBoardManager.Instance.photonView.RPC("RPC_AddDeath", RpcTarget.MasterClient, PhotonNetwork.NickName);
+                LeaderBoardManager.Instance.photonView.RPC("RPC_AddKill", RpcTarget.MasterClient, attacker);
+                playerManager.Die();
+            }
         }
+       
 
         pnView.RPC("RPC_UpdateHealth", RpcTarget.All, currentHealth);
     }
