@@ -3,25 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class DayNightCycle : MonoBehaviourPun
+public class DayNightCycle : MonoBehaviourPunCallbacks
 {
-    [Header("Настройки")]
     public float dayLengthInSeconds = 60f;
-
     private float rotationSpeed;
-    private PhotonView view;
+    private float currentRotationX = 0f;
 
     void Start()
     {
         rotationSpeed = 360f / dayLengthInSeconds;
-        view = GetComponent<PhotonView>(); // получаем компонент PhotonView
+        currentRotationX = transform.eulerAngles.x;
     }
 
     void Update()
     {
-        if (view != null && view.IsMine)
+        if (photonView.IsMine)
         {
-            transform.Rotate(Vector3.right * rotationSpeed * Time.deltaTime);
+            currentRotationX += rotationSpeed * Time.deltaTime;
+
+            if (currentRotationX >= 360f)
+                currentRotationX = 0f;
+
+            transform.rotation = Quaternion.Euler(currentRotationX, 0f, 0f);
         }
     }
 }
