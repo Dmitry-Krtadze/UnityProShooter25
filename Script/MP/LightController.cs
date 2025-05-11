@@ -7,7 +7,7 @@ public class LightController : MonoBehaviour
     public string globalLightName = "GlobalLight"; // Имя directional light
 
     // Порог для включения света ночью (если солнце ниже горизонта)
-    public float nightThreshold = 100f;
+    public float nightThreshold = 0f;
 
     void Start()
     {
@@ -40,7 +40,7 @@ public class LightController : MonoBehaviour
 
         // Считаем, что день — когда X около 90 (над головой), а ночь — когда далеко от 90
         // Можно изменить условие по вкусу
-        bool isNight = xRotation > nightThreshold && xRotation < 300f;
+        bool isNight = xRotation > nightThreshold && xRotation < -160f;
 
         // Включаем или выключаем лампу
         lampLight.enabled = isNight;

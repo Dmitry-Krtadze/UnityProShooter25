@@ -399,13 +399,34 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
             GameObject bulletHole = Instantiate(bulletHolePrefab,
                                                 hitPoint + hitNormal * 0.01f,
                                                 Quaternion.LookRotation(hitNormal));
-            // Если объект попадания имеет PhotonView и ViewID валиден, устанавливаем его как родителя
+
+            // Проверяем, попали ли в объект с PhotonView
             if (hitViewID != -1)
             {
                 PhotonView hitPhotonView = PhotonView.Find(hitViewID);
                 if (hitPhotonView != null)
                 {
-                    bulletHole.transform.SetParent(hitPhotonView.transform);
+                    Debug.Log("Hit object: " + hitPhotonView.gameObject.name + ", Parent: " + (hitPhotonView.transform.parent != null ? hitPhotonView.transform.parent.name : "None"));
+                    if (hitPhotonView.gameObject.CompareTag("Target"))
+                    {
+                        // Если попали в Target, ищем его родителя (например, PivotTarget или standingTarget)
+                        Transform parentTransform = hitPhotonView.transform.parent;
+                        if (parentTransform != null && parentTransform.name.Contains("PivotTarget"))
+                        {
+                            bulletHole.transform.SetParent(parentTransform);
+                            bulletHole.transform.localRotation = Quaternion.identity; // Унаследовать поворот родителя
+                        }
+                        else
+                        {
+                            // Если родитель не PivotTarget, используем hitPhotonView.transform
+                            bulletHole.transform.SetParent(hitPhotonView.transform);
+                        }
+                    }
+                    else
+                    {
+                        // Для других объектов просто привязываем к hitPhotonView.transform
+                        bulletHole.transform.SetParent(hitPhotonView.transform);
+                    }
                 }
             }
             Destroy(bulletHole, 10f);

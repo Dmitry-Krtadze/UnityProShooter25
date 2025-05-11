@@ -13832,3 +13832,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackRange: 5
   attackCooldown: 1
+--- !u!136 &8966976769149712976
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8966976769149712974}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 1.1754847
+  m_Height: 2.3509693
+  m_Direction: 0
+  m_Center: {x: 0, y: 0.3872311, z: 0.28825378}
