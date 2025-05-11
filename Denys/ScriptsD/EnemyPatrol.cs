@@ -36,6 +36,7 @@ public class EnemyPatrol : MonoBehaviour
         if (isChasing && player != null)
         {
             float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+          
             if (distanceToPlayer > stoppingDistance)
             {
                 agent.destination = player.position;
