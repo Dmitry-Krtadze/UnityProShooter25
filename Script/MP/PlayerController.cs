@@ -296,85 +296,101 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         }
     }
     private void ExecuteShot(Item currentItem)
+{
+    if (currentItem.currentAmmo > 0)
     {
-        if (currentItem.currentAmmo > 0)
+        items[itemIndex].Use();
+        currentItem.currentAmmo--;
+        string weaponType = currentItem.weaponType;
+        GetComponent<RecoilController>().ApplyRecoil(weaponType);
+
+        if (weaponType == "Pistol")
         {
-            items[itemIndex].Use();
-            currentItem.currentAmmo--;
-            string weaponType = currentItem.weaponType;
-            GetComponent<RecoilController>().ApplyRecoil(weaponType);
-
-            if (weaponType == "Pistol")
-            {
-                GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "PistolShoot"));
-            }
-            else if (weaponType == "AK47")
-            {
-                GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "AutoShoot"));
-            }
-
-            UpdateAmmoUI();
-            GetComponentInChildren<WeaponKickback>().ApplyRecoil(weaponType);
-
-            // Луч из текущей позиции и направления камеры
-            Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
-            if (Physics.Raycast(ray, out RaycastHit hit, range))
-            {
-                if (activeMuzzle != null)
-                {
-                    pnView.RPC("RPC_SpawnMuzzleFlash", RpcTarget.All, activeMuzzle.position, activeMuzzle.rotation);
-                }
-                pnView.RPC("RPC_SpawnImpactEffect", RpcTarget.All, hit.point, hit.normal);
-
-                // >>> Реакция на попадание в мишень
-                if (hit.collider.CompareTag("Target"))  // Проверяем, попали ли в мишень
-                {
-                    Target target = hit.collider.GetComponent<Target>();  // Получаем компонент мишени
-                    if (target != null)
-                    {
-                        target.OnHit();  // Вызываем метод OnHit, чтобы мишень отреагировала
-                    }
-                }
-
-                // >>> Реакция на телепортацию
-                else if (hit.collider.CompareTag("Teleport1"))
-                {
-                    GameObject teleport2 = GameObject.FindWithTag("Teleport2");
-                    if (teleport2 != null)
-                    {
-                        transform.position = teleport2.transform.position;
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Teleport2 не найден!");
-                    }
-                }
-                else if (hit.collider.CompareTag("Teleport2"))
-                {
-                    GameObject teleport1 = GameObject.FindWithTag("Teleport1");
-                    if (teleport1 != null)
-                    {
-                        transform.position = teleport1.transform.position;
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Teleport1 не найден!");
-                    }
-                }
-            }
+            GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "PistolShoot"));
         }
-        else
+        else if (weaponType == "AK47")
         {
-            if (currentItem.weaponType == "Pistol")
+            GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "AutoShoot"));
+        }
+
+        UpdateAmmoUI();
+        GetComponentInChildren<WeaponKickback>().ApplyRecoil(weaponType);
+
+        // Луч из текущей позиции и направления камеры
+        Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+        if (Physics.Raycast(ray, out RaycastHit hit, range))
+        {
+            if (activeMuzzle != null)
             {
-                GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "PistolEmpty"));
+                pnView.RPC("RPC_SpawnMuzzleFlash", RpcTarget.All, activeMuzzle.position, activeMuzzle.rotation);
             }
-            else if (currentItem.weaponType == "AK47")
+            pnView.RPC("RPC_SpawnImpactEffect", RpcTarget.All, hit.point, hit.normal);
+
+            // Реакция на попадание в мишень
+            if (IsTagDefined("Target") && hit.collider.CompareTag("Target"))
             {
-                GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "AutoEmpty"));
+                Target target = hit.collider.GetComponent<Target>();
+                if (target != null)
+                {
+                    target.OnHit();
+                }
+            }
+            // Реакция на телепортацию
+            else if (IsTagDefined("Teleport1") && hit.collider.CompareTag("Teleport1"))
+            {
+                GameObject teleport2 = GameObject.FindWithTag("Teleport2");
+                if (teleport2 != null)
+                {
+                    transform.position = teleport2.transform.position;
+                }
+                else
+                {
+                    Debug.LogWarning("Teleport2 не найден!");
+                }
+            }
+            else if (IsTagDefined("Teleport2") && hit.collider.CompareTag("Teleport2"))
+            {
+                GameObject teleport1 = GameObject.FindWithTag("Teleport1");
+                if (teleport1 != null)
+                {
+                    transform.position = teleport1.transform.position;
+                }
+                else
+                {
+                    Debug.LogWarning("Teleport1 не найден!");
+                }
             }
         }
     }
+    else
+    {
+        if (currentItem.weaponType == "Pistol")
+        {
+            GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "PistolEmpty"));
+        }
+        else if (currentItem.weaponType == "AK47")
+        {
+            GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "AutoEmpty"));
+        }
+    }
+}
+
+// Метод для проверки, определен ли тег
+private bool IsTagDefined(string tag)
+{
+    try
+    {
+        // Попытка сравнить тег с пустым объектом (не создаем объект, просто проверяем тег)
+        GameObject dummy = null;
+        dummy.CompareTag(tag); // Если тег не определен, выбросит исключение
+        return true;
+    }
+    catch
+    {
+        Debug.LogWarning($"Tag '{tag}' is not defined in Unity. Please add it in the Tag Manager.");
+        return false;
+    }
+}
 
 
     [PunRPC]
@@ -415,22 +431,40 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         LeaderBoardManager.UpdateLeaderboard(playerName, currentStats.kills, currentStats.deaths, newScore);
         LeaderBoardManager.SyncLeaderboard();
     }
-
     public void TakeDamage(float damage, string attacker, bool isMob)
     {
+        Debug.Log($"TakeDamage called: damage={damage}, attacker={attacker}, isMob={isMob}");
+        if (!pnView.IsMine) return;
 
-        pnView.RPC("RPC_Damage", RpcTarget.Others, damage, attacker, isMob);
-        
-        
+        // Уменьшаем здоровье
+        currentHealth -= damage;
+        hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
+        hpBar.value = currentHealth; // Обновляем слайдер здоровья
+        Debug.Log($"Health reduced to: {currentHealth}");
+
+        // Проверяем, умер ли игрок
+        if (currentHealth <= 0)
+        {
+            // Обновляем статистику (убийства и смерти)
+            LeaderBoardManager.Instance.photonView.RPC("RPC_AddDeath", RpcTarget.MasterClient, PhotonNetwork.NickName);
+            if (!isMob) // Учитываем убийство только для игроков, а не мобов
+            {
+                LeaderBoardManager.Instance.photonView.RPC("RPC_AddKill", RpcTarget.MasterClient, attacker);
+            }
+            playerManager.Die(); // Вызываем смерть игрока
+        }
+
+        // Синхронизируем здоровье для всех клиентов
+        pnView.RPC("RPC_UpdateHealth", RpcTarget.All, currentHealth);
     }
-    
+
     [PunRPC]
     void RPC_KillZone(float damage, string attacker)
-{
-    LeaderBoardManager.Instance.photonView.RPC("RPC_AddDeath", RpcTarget.MasterClient, PhotonNetwork.NickName);
-    LeaderBoardManager.Instance.photonView.RPC("RPC_AddKill", RpcTarget.MasterClient, attacker);
-    playerManager.Die();
-}
+    {
+        LeaderBoardManager.Instance.photonView.RPC("RPC_AddDeath", RpcTarget.MasterClient, PhotonNetwork.NickName);
+        LeaderBoardManager.Instance.photonView.RPC("RPC_AddKill", RpcTarget.MasterClient, attacker);
+        playerManager.Die();
+    }
 
     [PunRPC]
     void RPC_Damage(float damage, string attacker, bool isMob)
@@ -457,11 +491,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     [PunRPC]
     void RPC_UpdateHealth(float health)
     {
-        if (!pnView.IsMine)
-        {
-            hpBar.value = health;
-            hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
-        }
+        currentHealth = health;
+        hpBar.value = health;
+        hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
+        Debug.Log($"Health synced to: {currentHealth}");
     }
 
     private void Look()
