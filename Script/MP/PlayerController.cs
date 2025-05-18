@@ -356,6 +356,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
                         transform.position = teleport1.transform.position;
                     }
                 }
+                else if (hit.collider.CompareTag("Enemy"))
+                {
+                   EnemyPatrol target = hit.collider.GetComponent<EnemyPatrol>();
+                     if (target != null)
+                    {
+                        Debug.Log("Enemy was hitted");
+                        target.OnHit();
+                    }
+                }
             }
         }
         else

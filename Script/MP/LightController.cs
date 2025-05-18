@@ -4,17 +4,12 @@ public class LightController : MonoBehaviour
 {
     private Light lampLight;
     private Transform globalLightTransform;
-    public string globalLightName = "GlobalLight"; // Имя directional light
-
-    // Порог для включения света ночью (если солнце ниже горизонта)
-    public float nightThreshold = 0f;
+    public string globalLightName = "GlobalLight";
 
     void Start()
     {
-        // Берём свет лампы
         lampLight = GetComponent<Light>();
 
-        // Находим глобальный directional light
         GameObject globalLight = GameObject.Find(globalLightName);
         if (globalLight != null)
         {
@@ -35,14 +30,9 @@ public class LightController : MonoBehaviour
     {
         if (lampLight == null || globalLightTransform == null) return;
 
-        // Получаем поворот по X
-        float xRotation = globalLightTransform.rotation.eulerAngles.x;
+        // Считаем, что ночь — когда свет направлен вверх
+        bool isNight = Vector3.Dot(globalLightTransform.forward, Vector3.down) < 0f;
 
-        // Считаем, что день — когда X около 90 (над головой), а ночь — когда далеко от 90
-        // Можно изменить условие по вкусу
-        bool isNight = xRotation > nightThreshold && xRotation < -160f;
-
-        // Включаем или выключаем лампу
         lampLight.enabled = isNight;
     }
 }
