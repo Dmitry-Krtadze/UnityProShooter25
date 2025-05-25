@@ -26,6 +26,19 @@ public class EnemyPatrol : MonoBehaviourPunCallbacks, IPunObservable
         agent = GetComponent<NavMeshAgent>();
         agent.stoppingDistance = stoppingDistance;
         agent.speed = 2f;
+
+        // Динамическое заполнение массива goals
+        GameObject[] patrolPoints = GameObject.FindGameObjectsWithTag("PatrolPoint");
+        goals = new Transform[patrolPoints.Length];
+        if (patrolPoints.Length == 0)
+        {
+            Debug.LogWarning("No objects with tag 'PatrolPoint' found!");
+        }
+        for (int i = 0; i < patrolPoints.Length; i++)
+        {
+            goals[i] = patrolPoints[i].transform;
+        }
+
         SetClosestGoal();
         en_Animator = gameObject.GetComponent<Animator>();
         en_Animator.SetBool("IsWalk", true);
