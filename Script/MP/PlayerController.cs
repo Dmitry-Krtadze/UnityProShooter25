@@ -365,6 +365,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
                         target.OnHit();
                     }
                 }
+                else if (hit.collider.CompareTag("sun"))
+                {
+                    sunScript sun = hit.collider.GetComponent<sunScript>();
+                    if (sun != null)
+                    {
+                        Debug.Log("spawn allo");
+                        sun.SpawnPrikol();
+                    }
+                }
             }
         }
         else
