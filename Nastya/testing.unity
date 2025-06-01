@@ -7500,7 +7500,7 @@ PrefabInstance:
     - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af,
         type: 3}
       propertyPath: objectsToSpawn.Array.size
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af,
         type: 3}
@@ -7531,13 +7531,13 @@ PrefabInstance:
         type: 3}
       propertyPath: objectsToSpawn.Array.data[0]
       value: 
-      objectReference: {fileID: 319606944832797154, guid: f3ed30f056cf78e449c54a2654e656e6,
+      objectReference: {fileID: 319606944832797154, guid: d80369f814ea846439356d6a6caf97d0,
         type: 3}
     - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af,
         type: 3}
       propertyPath: objectsToSpawn.Array.data[1]
       value: 
-      objectReference: {fileID: 319606944832797154, guid: d80369f814ea846439356d6a6caf97d0,
+      objectReference: {fileID: 319606944832797154, guid: f3ed30f056cf78e449c54a2654e656e6,
         type: 3}
     - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af,
         type: 3}
@@ -21733,6 +21733,7 @@ GameObject:
   - component: {fileID: 1592980513}
   - component: {fileID: 1592980517}
   - component: {fileID: 1592980518}
+  - component: {fileID: 1592980519}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: sun
@@ -21833,7 +21834,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7710de27cedf3f42b0913110999ac57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 319606944832797162, guid: 57793053394bbaf408737fc9f144d113, type: 3}
+  player: {fileID: 0}
+  sun: {fileID: 1592980518}
+  teleportDistance: 15
+  teleportPosition: {x: 54.8, y: 73.68, z: -40.6}
 --- !u!114 &1592980518
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21848,6 +21852,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   missle: {fileID: 319606944832797154, guid: f3ed30f056cf78e449c54a2654e656e6, type: 3}
   speed: 5
+  isChasingPlayer: 0
+--- !u!114 &1592980519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1592980512}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8862abeb42b114c41a9bfa442c6b847e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canvasGroup: {fileID: 0}
+  fadeSpeed: 1
 --- !u!1001 &1599794089
 PrefabInstance:
   m_ObjectHideFlags: 0
