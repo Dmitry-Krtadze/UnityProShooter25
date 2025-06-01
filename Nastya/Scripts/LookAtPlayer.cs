@@ -4,7 +4,14 @@ public class LookAtPlayer : MonoBehaviour
 {
     public Transform player;
     private float searchTimer = 0f;
-    private float searchInterval = 1f; // шукати кожну секунду
+    private float searchInterval = 1f;
+
+    public sunScript sun; // <-- перет€ни объект Sun с компонентом sunScript сюда в инспекторе
+
+    [SerializeField] private float teleportDistance = 20f;
+    [SerializeField] private Vector3 teleportPosition = new Vector3(54.7999992f, 73.6800003f, -40.5999985f);
+
+    private bool hasTeleported = false;
 
     void Update()
     {
@@ -23,10 +30,24 @@ public class LookAtPlayer : MonoBehaviour
         }
         else
         {
-            // ќбчислюЇмо напр€мок ≥ компенсуЇмо поворот (€кщо обличч€ дивитьс€ вздовж ос≥ X)
+            float distance = Vector3.Distance(transform.position, player.position);
+
+            if ( distance < teleportDistance)
+            {
+                transform.position = teleportPosition;
+      
+                if (sun != null)
+                {
+                    sun.isChasingPlayer = false; // включаем преследование
+                }
+            }
+
+            // поворот как в оригинале
             Vector3 direction = player.position - transform.position;
             Quaternion lookRotation = Quaternion.LookRotation(direction);
             transform.rotation = lookRotation * Quaternion.Euler(0, -90, 0);
+
+            
         }
     }
 }
