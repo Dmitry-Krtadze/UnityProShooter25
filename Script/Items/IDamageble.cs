@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface IDamageble
 {
-    void TakeDamage(float damage, string attacker);
+    void TakeDamage(float damage, string attacker, bool isMob);
 }

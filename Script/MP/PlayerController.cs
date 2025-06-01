@@ -324,29 +324,28 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
                 {
                     pnView.RPC("RPC_SpawnMuzzleFlash", RpcTarget.All, activeMuzzle.position, activeMuzzle.rotation);
                 }
-                pnView.RPC("RPC_SpawnImpactEffect", RpcTarget.All, hit.point, hit.normal);
+                // Получаем PhotonView объекта попадания, если он есть
+                PhotonView hitPhotonView = hit.collider.GetComponent<PhotonView>();
+                int hitViewID = hitPhotonView != null ? hitPhotonView.ViewID : -1;
+                pnView.RPC("RPC_SpawnImpactEffect", RpcTarget.All, hit.point, hit.normal, hitViewID);
 
-                // >>> Реакция на попадание в мишень
-                if (hit.collider.CompareTag("Target"))  // Проверяем, попали ли в мишень
+                // Реакция на попадание в мишень
+                if (hit.collider.CompareTag("Target"))
                 {
-                    Target target = hit.collider.GetComponent<Target>();  // Получаем компонент мишени
+                    Target target = hit.collider.GetComponent<Target>();
                     if (target != null)
                     {
-                        target.OnHit();  // Вызываем метод OnHit, чтобы мишень отреагировала
+                        Debug.Log("Hit Target");
+                        target.OnHit();
                     }
                 }
-
-                // >>> Реакция на телепортацию
+                // Реакция на телепортацию
                 else if (hit.collider.CompareTag("Teleport1"))
                 {
                     GameObject teleport2 = GameObject.FindWithTag("Teleport2");
                     if (teleport2 != null)
                     {
                         transform.position = teleport2.transform.position;
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Teleport2 не найден!");
                     }
                 }
                 else if (hit.collider.CompareTag("Teleport2"))
@@ -356,9 +355,23 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
                     {
                         transform.position = teleport1.transform.position;
                     }
-                    else
+                }
+                else if (hit.collider.CompareTag("Enemy"))
+                {
+                   EnemyPatrol target = hit.collider.GetComponent<EnemyPatrol>();
+                     if (target != null)
                     {
-                        Debug.LogWarning("Teleport1 не найден!");
+                        Debug.Log("Enemy was hitted");
+                        target.OnHit();
+                    }
+                }
+                else if (hit.collider.CompareTag("sun"))
+                {
+                    sunScript sun = hit.collider.GetComponent<sunScript>();
+                    if (sun != null)
+                    {
+                        Debug.Log("spawn allo");
+                        sun.SpawnPrikol();
                     }
                 }
             }
@@ -376,6 +389,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         }
     }
 
+   
+
 
     [PunRPC]
     void RPC_SpawnMuzzleFlash(Vector3 position, Quaternion rotation)
@@ -389,9 +404,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         }
         Destroy(flash, 0.5f);
     }
-
     [PunRPC]
-    void RPC_SpawnImpactEffect(Vector3 hitPoint, Vector3 hitNormal)
+    void RPC_SpawnImpactEffect(Vector3 hitPoint, Vector3 hitNormal, int hitViewID)
     {
         if (impactEffectPrefabs != null && impactEffectPrefabs.Length > 0)
         {
@@ -401,8 +415,38 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         if (bulletHolePrefab != null)
         {
             GameObject bulletHole = Instantiate(bulletHolePrefab,
-                                                  hitPoint + hitNormal * 0.01f,
-                                                  Quaternion.LookRotation(hitNormal));
+                                                hitPoint + hitNormal * 0.01f,
+                                                Quaternion.LookRotation(hitNormal));
+
+            // Проверяем, попали ли в объект с PhotonView
+            if (hitViewID != -1)
+            {
+                PhotonView hitPhotonView = PhotonView.Find(hitViewID);
+                if (hitPhotonView != null)
+                {
+                    Debug.Log("Hit object: " + hitPhotonView.gameObject.name + ", Parent: " + (hitPhotonView.transform.parent != null ? hitPhotonView.transform.parent.name : "None"));
+                    if (hitPhotonView.gameObject.CompareTag("Target"))
+                    {
+                        // Если попали в Target, ищем его родителя (например, PivotTarget или standingTarget)
+                        Transform parentTransform = hitPhotonView.transform.parent;
+                        if (parentTransform != null && parentTransform.name.Contains("PivotTarget"))
+                        {
+                            bulletHole.transform.SetParent(parentTransform);
+                            bulletHole.transform.localRotation = Quaternion.identity; // Унаследовать поворот родителя
+                        }
+                        else
+                        {
+                            // Если родитель не PivotTarget, используем hitPhotonView.transform
+                            bulletHole.transform.SetParent(hitPhotonView.transform);
+                        }
+                    }
+                    else
+                    {
+                        // Для других объектов просто привязываем к hitPhotonView.transform
+                        bulletHole.transform.SetParent(hitPhotonView.transform);
+                    }
+                }
+            }
             Destroy(bulletHole, 10f);
         }
     }
@@ -415,35 +459,59 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         LeaderBoardManager.UpdateLeaderboard(playerName, currentStats.kills, currentStats.deaths, newScore);
         LeaderBoardManager.SyncLeaderboard();
     }
-
-    public void TakeDamage(float damage, string attacker)
+    public void TakeDamage(float damage, string attacker, bool isMob)
     {
-        pnView.RPC("RPC_Damage", RpcTarget.Others, damage, attacker);
+        Debug.Log($"TakeDamage called: damage={damage}, attacker={attacker}, isMob={isMob}");
+        if (!pnView.IsMine) return;
+
+        // Уменьшаем здоровье
+        currentHealth -= damage;
+        hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
+        hpBar.value = currentHealth; // Обновляем слайдер здоровья
+        Debug.Log($"Health reduced to: {currentHealth}");
+
+        // Проверяем, умер ли игрок
+        if (currentHealth <= 0)
+        {
+            // Обновляем статистику (убийства и смерти)
+            LeaderBoardManager.Instance.photonView.RPC("RPC_AddDeath", RpcTarget.MasterClient, PhotonNetwork.NickName);
+            if (!isMob) // Учитываем убийство только для игроков, а не мобов
+            {
+                LeaderBoardManager.Instance.photonView.RPC("RPC_AddKill", RpcTarget.MasterClient, attacker);
+            }
+            playerManager.Die(); // Вызываем смерть игрока
+        }
+
+        // Синхронизируем здоровье для всех клиентов
+        pnView.RPC("RPC_UpdateHealth", RpcTarget.All, currentHealth);
     }
 
     [PunRPC]
-void RPC_KillZone(float damage, string attacker)
-{
-    LeaderBoardManager.Instance.photonView.RPC("RPC_AddDeath", RpcTarget.MasterClient, PhotonNetwork.NickName);
-    LeaderBoardManager.Instance.photonView.RPC("RPC_AddKill", RpcTarget.MasterClient, attacker);
-    playerManager.Die();
-}
+    void RPC_KillZone(float damage, string attacker)
+    {
+        LeaderBoardManager.Instance.photonView.RPC("RPC_AddDeath", RpcTarget.MasterClient, PhotonNetwork.NickName);
+        LeaderBoardManager.Instance.photonView.RPC("RPC_AddKill", RpcTarget.MasterClient, attacker);
+        playerManager.Die();
+    }
 
     [PunRPC]
-    void RPC_Damage(float damage, string attacker)
+    void RPC_Damage(float damage, string attacker, bool isMob)
     {
         if (!pnView.IsMine) return;
 
         currentHealth -= damage;
         hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
         Debug.Log(attacker);
-
-        if (currentHealth <= 0)
+        if (!isMob)
         {
-            LeaderBoardManager.Instance.photonView.RPC("RPC_AddDeath", RpcTarget.MasterClient, PhotonNetwork.NickName);
-            LeaderBoardManager.Instance.photonView.RPC("RPC_AddKill", RpcTarget.MasterClient, attacker);
-            playerManager.Die();
+            if (currentHealth <= 0)
+            {
+                LeaderBoardManager.Instance.photonView.RPC("RPC_AddDeath", RpcTarget.MasterClient, PhotonNetwork.NickName);
+                LeaderBoardManager.Instance.photonView.RPC("RPC_AddKill", RpcTarget.MasterClient, attacker);
+                playerManager.Die();
+            }
         }
+       
 
         pnView.RPC("RPC_UpdateHealth", RpcTarget.All, currentHealth);
     }
@@ -451,11 +519,10 @@ void RPC_KillZone(float damage, string attacker)
     [PunRPC]
     void RPC_UpdateHealth(float health)
     {
-        if (!pnView.IsMine)
-        {
-            hpBar.value = health;
-            hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
-        }
+        currentHealth = health;
+        hpBar.value = health;
+        hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
+        Debug.Log($"Health synced to: {currentHealth}");
     }
 
     private void Look()

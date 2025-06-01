@@ -1,8 +1,10 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
+using Photon.Pun;
+using Photon.Realtime;
 
-public class EnemyPatrol : MonoBehaviour
+public class EnemyPatrol : MonoBehaviourPunCallbacks, IPunObservable
 {
     private NavMeshAgent agent;
     public Transform[] goals;
@@ -10,12 +12,13 @@ public class EnemyPatrol : MonoBehaviour
     public float distanceToChangeGoal = 1f;
     private int currentGoal = 0;
     public float chaseDistance = 5f; // Радиус обнаружения игрока
-    public float stoppingDistance = 1.5f; // Расстояние остановки от игрока
+    public float stoppingDistance = 1f; // Расстояние остановки от игрока
     public LayerMask playerLayer;
 
     public float stopTime = 1.5f; // Публичная переменная для времени остановки, по умолчанию 1.5 секунды
-
-    private Transform player;
+    int hp = 100;
+    bool isDead = false; // чтобы избежать повторного уничтожения
+    private Transform player; // Оставляем приватным, но добавим публичный метод доступа
     private bool isChasing = false;
 
     void Start()
@@ -23,6 +26,19 @@ public class EnemyPatrol : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         agent.stoppingDistance = stoppingDistance;
         agent.speed = 2f;
+
+        // Динамическое заполнение массива goals
+        GameObject[] patrolPoints = GameObject.FindGameObjectsWithTag("PatrolPoint");
+        goals = new Transform[patrolPoints.Length];
+        if (patrolPoints.Length == 0)
+        {
+            Debug.LogWarning("No objects with tag 'PatrolPoint' found!");
+        }
+        for (int i = 0; i < patrolPoints.Length; i++)
+        {
+            goals[i] = patrolPoints[i].transform;
+        }
+
         SetClosestGoal();
         en_Animator = gameObject.GetComponent<Animator>();
         en_Animator.SetBool("IsWalk", true);
@@ -36,6 +52,7 @@ public class EnemyPatrol : MonoBehaviour
         if (isChasing && player != null)
         {
             float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+          
             if (distanceToPlayer > stoppingDistance)
             {
                 agent.destination = player.position;
@@ -57,7 +74,8 @@ public class EnemyPatrol : MonoBehaviour
         }
     }
 
-    void DetectPlayer()
+    // Делаем метод публичным, чтобы DelayDamage мог его вызывать
+    public void DetectPlayer()
     {
         Collider[] colliders = Physics.OverlapSphere(transform.position, chaseDistance, playerLayer);
         if (colliders.Length > 0)
@@ -67,8 +85,15 @@ public class EnemyPatrol : MonoBehaviour
         }
         else
         {
+            player = null;
             isChasing = false;
         }
+    }
+
+    // Добавляем публичный метод для доступа к player
+    public Transform GetPlayer()
+    {
+        return player;
     }
 
     void Patrol()
@@ -78,14 +103,12 @@ public class EnemyPatrol : MonoBehaviour
             Transform nextGoal = goals[currentGoal];
             currentGoal = (currentGoal + 1) % goals.Length;
 
-            // Если следующая цель - это патрульная точка, добавляем задержку
             if (goals[currentGoal] != player)
             {
                 StartCoroutine(PauseBeforeNextGoal());
             }
             else
             {
-                // Если цель - это игрок, сразу меняем на него
                 agent.destination = player.position;
             }
         }
@@ -93,10 +116,7 @@ public class EnemyPatrol : MonoBehaviour
 
     IEnumerator PauseBeforeNextGoal()
     {
-        // Ожидаем время остановки
         yield return new WaitForSeconds(stopTime);
-
-        // После паузы меняем точку и включаем анимацию движения
         agent.destination = goals[currentGoal].position;
         agent.speed = 2f;
     }
@@ -125,4 +145,32 @@ public class EnemyPatrol : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, chaseDistance);
     }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(hp);
+        }
+        else
+        {
+            hp = (int)stream.ReceiveNext();
+        }
+    }
+
+    public void OnHit()
+    {
+        // Только мастер-клиент обрабатывает урон
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+
+        hp -= 10;
+
+        if (hp <= 0 && !isDead)
+        {
+            isDead = true;
+            PhotonNetwork.Destroy(gameObject);
+        }
+    }
 }
+
