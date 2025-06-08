@@ -33,4 +33,13 @@ public class Rocket : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(Vector3.forward, direction);
         }
     }
+
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            Destroy(gameObject);
+        }
+    }
 }
