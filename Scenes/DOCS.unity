@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.46602172, g: 0.5960813, b: 0.7371453, a: 1}
+  m_IndirectSpecularColor: {r: 0.4094563, g: 0.5237313, b: 0.6476887, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -30701,6 +30701,55 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1942102290945635839, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
   m_PrefabInstance: {fileID: 1442194604}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1443095901
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1443095903}
+  - component: {fileID: 1443095902}
+  m_Layer: 0
+  m_Name: ShaderManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1443095902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1443095901}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f901aecff570dcf45b20068a2b1d5065, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skyboxMaterial: {fileID: 2100000, guid: efd1c33efd2d58340b88804268e6833f, type: 2}
+  globalLightTransform: {fileID: 1934419788}
+  dayExposure: 1.3
+  nightExposure: 0.2
+  transitionSpeed: 0.5
+--- !u!4 &1443095903
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1443095901}
+  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 423.8706, y: 331.9086, z: 158.53}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1445619208
 GameObject:
   m_ObjectHideFlags: 0
@@ -35246,53 +35295,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.01911359, y: 0.050020862, z: 0.025617894}
   m_Center: {x: -0.00000023841858, y: -0.0000019073486, z: -0.0031684963}
---- !u!1 &1674621261
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1674621263}
-  - component: {fileID: 1674621262}
-  m_Layer: 0
-  m_Name: SkyboxChanger
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1674621262
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1674621261}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3de9738c8ec0d814d92ffa44e5be69cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  blendedSkybox: {fileID: 0}
-  globalLightTransform: {fileID: 1934419788}
-  blendSpeed: 0.5
---- !u!4 &1674621263
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1674621261}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.90944, y: -2.404449, z: 8.005791}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1674767409 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2bcadbf7d4f0de04d9914c3ea567eaa4, type: 3}
@@ -41273,14 +41275,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1934419786}
-  m_LocalRotation: {x: -0.8378557, y: -0.4982339, z: 0.19173288, w: 0.114014655}
+  m_LocalRotation: {x: -0.6052855, y: -0.51445645, z: 0.45068654, w: -0.40724167}
   m_LocalPosition: {x: 438.8902, y: 361.12424, z: 184.83325}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: 0, y: -514.221, z: -961.476}
+  m_LocalEulerAnglesHint: {x: 73.08, y: -514.221, z: -961.476}
 --- !u!114 &1934419789
 MonoBehaviour:
   m_ObjectHideFlags: 0
