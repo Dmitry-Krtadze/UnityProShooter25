@@ -296,101 +296,100 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
         }
     }
     private void ExecuteShot(Item currentItem)
-{
-    if (currentItem.currentAmmo > 0)
     {
-        items[itemIndex].Use();
-        currentItem.currentAmmo--;
-        string weaponType = currentItem.weaponType;
-        GetComponent<RecoilController>().ApplyRecoil(weaponType);
-
-        if (weaponType == "Pistol")
+        if (currentItem.currentAmmo > 0)
         {
-            GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "PistolShoot"));
+            items[itemIndex].Use();
+            currentItem.currentAmmo--;
+            string weaponType = currentItem.weaponType;
+            GetComponent<RecoilController>().ApplyRecoil(weaponType);
+
+            if (weaponType == "Pistol")
+            {
+                GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "PistolShoot"));
+            }
+            else if (weaponType == "AK47")
+            {
+                GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "AutoShoot"));
+            }
+
+            UpdateAmmoUI();
+            GetComponentInChildren<WeaponKickback>().ApplyRecoil(weaponType);
+
+            // Луч из текущей позиции и направления камеры
+            Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+            if (Physics.Raycast(ray, out RaycastHit hit, range))
+            {
+                if (activeMuzzle != null)
+                {
+                    pnView.RPC("RPC_SpawnMuzzleFlash", RpcTarget.All, activeMuzzle.position, activeMuzzle.rotation);
+                }
+                // Получаем PhotonView объекта попадания, если он есть
+                PhotonView hitPhotonView = hit.collider.GetComponent<PhotonView>();
+                int hitViewID = hitPhotonView != null ? hitPhotonView.ViewID : -1;
+                pnView.RPC("RPC_SpawnImpactEffect", RpcTarget.All, hit.point, hit.normal, hitViewID);
+
+                // Реакция на попадание в мишень
+                if (hit.collider.CompareTag("Target"))
+                {
+                    Target target = hit.collider.GetComponent<Target>();
+                    if (target != null)
+                    {
+                        Debug.Log("Hit Target");
+                        target.OnHit();
+                    }
+                }
+                // Реакция на телепортацию
+                else if (hit.collider.CompareTag("Teleport1"))
+                {
+                    GameObject teleport2 = GameObject.FindWithTag("Teleport2");
+                    if (teleport2 != null)
+                    {
+                        transform.position = teleport2.transform.position;
+                    }
+                }
+                else if (hit.collider.CompareTag("Teleport2"))
+                {
+                    GameObject teleport1 = GameObject.FindWithTag("Teleport1");
+                    if (teleport1 != null)
+                    {
+                        transform.position = teleport1.transform.position;
+                    }
+                }
+                else if (hit.collider.CompareTag("Enemy"))
+                {
+                   EnemyPatrol target = hit.collider.GetComponent<EnemyPatrol>();
+                     if (target != null)
+                    {
+                        Debug.Log("Enemy was hitted");
+                        target.OnHit();
+                    }
+                }
+                else if (hit.collider.CompareTag("sun"))
+                {
+                    sunScript sun = hit.collider.GetComponent<sunScript>();
+                    if (sun != null)
+                    {
+                        Debug.Log("spawn allo");
+                        sun.SpawnPrikol();
+                    }
+                }
+            }
         }
-        else if (weaponType == "AK47")
+        else
         {
-            GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "AutoShoot"));
-        }
-
-        UpdateAmmoUI();
-        GetComponentInChildren<WeaponKickback>().ApplyRecoil(weaponType);
-
-        // Луч из текущей позиции и направления камеры
-        Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
-        if (Physics.Raycast(ray, out RaycastHit hit, range))
-        {
-            if (activeMuzzle != null)
+            if (currentItem.weaponType == "Pistol")
             {
-                pnView.RPC("RPC_SpawnMuzzleFlash", RpcTarget.All, activeMuzzle.position, activeMuzzle.rotation);
+                GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "PistolEmpty"));
             }
-            pnView.RPC("RPC_SpawnImpactEffect", RpcTarget.All, hit.point, hit.normal);
-
-            // Реакция на попадание в мишень
-            if (IsTagDefined("Target") && hit.collider.CompareTag("Target"))
+            else if (currentItem.weaponType == "AK47")
             {
-                Target target = hit.collider.GetComponent<Target>();
-                if (target != null)
-                {
-                    target.OnHit();
-                }
-            }
-            // Реакция на телепортацию
-            else if (IsTagDefined("Teleport1") && hit.collider.CompareTag("Teleport1"))
-            {
-                GameObject teleport2 = GameObject.FindWithTag("Teleport2");
-                if (teleport2 != null)
-                {
-                    transform.position = teleport2.transform.position;
-                }
-                else
-                {
-                    Debug.LogWarning("Teleport2 не найден!");
-                }
-            }
-            else if (IsTagDefined("Teleport2") && hit.collider.CompareTag("Teleport2"))
-            {
-                GameObject teleport1 = GameObject.FindWithTag("Teleport1");
-                if (teleport1 != null)
-                {
-                    transform.position = teleport1.transform.position;
-                }
-                else
-                {
-                    Debug.LogWarning("Teleport1 не найден!");
-                }
+                GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "AutoEmpty"));
             }
         }
     }
-    else
-    {
-        if (currentItem.weaponType == "Pistol")
-        {
-            GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "PistolEmpty"));
-        }
-        else if (currentItem.weaponType == "AK47")
-        {
-            GetComponentInChildren<UniversalSoundPlayer>().PlaySound(true, soundGod.GetSound("PlayerWeapon", "AutoEmpty"));
-        }
-    }
-}
 
-// Метод для проверки, определен ли тег
-private bool IsTagDefined(string tag)
-{
-    try
-    {
-        // Попытка сравнить тег с пустым объектом (не создаем объект, просто проверяем тег)
-        GameObject dummy = null;
-        dummy.CompareTag(tag); // Если тег не определен, выбросит исключение
-        return true;
-    }
-    catch
-    {
-        Debug.LogWarning($"Tag '{tag}' is not defined in Unity. Please add it in the Tag Manager.");
-        return false;
-    }
-}
+   
 
 
     [PunRPC]
@@ -405,9 +404,8 @@ private bool IsTagDefined(string tag)
         }
         Destroy(flash, 0.5f);
     }
-
     [PunRPC]
-    void RPC_SpawnImpactEffect(Vector3 hitPoint, Vector3 hitNormal)
+    void RPC_SpawnImpactEffect(Vector3 hitPoint, Vector3 hitNormal, int hitViewID)
     {
         if (impactEffectPrefabs != null && impactEffectPrefabs.Length > 0)
         {
@@ -417,8 +415,38 @@ private bool IsTagDefined(string tag)
         if (bulletHolePrefab != null)
         {
             GameObject bulletHole = Instantiate(bulletHolePrefab,
-                                                  hitPoint + hitNormal * 0.01f,
-                                                  Quaternion.LookRotation(hitNormal));
+                                                hitPoint + hitNormal * 0.01f,
+                                                Quaternion.LookRotation(hitNormal));
+
+            // Проверяем, попали ли в объект с PhotonView
+            if (hitViewID != -1)
+            {
+                PhotonView hitPhotonView = PhotonView.Find(hitViewID);
+                if (hitPhotonView != null)
+                {
+                    Debug.Log("Hit object: " + hitPhotonView.gameObject.name + ", Parent: " + (hitPhotonView.transform.parent != null ? hitPhotonView.transform.parent.name : "None"));
+                    if (hitPhotonView.gameObject.CompareTag("Target"))
+                    {
+                        // Если попали в Target, ищем его родителя (например, PivotTarget или standingTarget)
+                        Transform parentTransform = hitPhotonView.transform.parent;
+                        if (parentTransform != null && parentTransform.name.Contains("PivotTarget"))
+                        {
+                            bulletHole.transform.SetParent(parentTransform);
+                            bulletHole.transform.localRotation = Quaternion.identity; // Унаследовать поворот родителя
+                        }
+                        else
+                        {
+                            // Если родитель не PivotTarget, используем hitPhotonView.transform
+                            bulletHole.transform.SetParent(hitPhotonView.transform);
+                        }
+                    }
+                    else
+                    {
+                        // Для других объектов просто привязываем к hitPhotonView.transform
+                        bulletHole.transform.SetParent(hitPhotonView.transform);
+                    }
+                }
+            }
             Destroy(bulletHole, 10f);
         }
     }

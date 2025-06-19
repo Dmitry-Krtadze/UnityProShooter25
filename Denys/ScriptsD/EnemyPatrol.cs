@@ -1,8 +1,10 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
+using Photon.Pun;
+using Photon.Realtime;
 
-public class EnemyPatrol : MonoBehaviour
+public class EnemyPatrol : MonoBehaviourPunCallbacks, IPunObservable
 {
     private NavMeshAgent agent;
     public Transform[] goals;
@@ -14,7 +16,8 @@ public class EnemyPatrol : MonoBehaviour
     public LayerMask playerLayer;
 
     public float stopTime = 1.5f; // Публичная переменная для времени остановки, по умолчанию 1.5 секунды
-
+    int hp = 100;
+    bool isDead = false; // чтобы избежать повторного уничтожения
     private Transform player; // Оставляем приватным, но добавим публичный метод доступа
     private bool isChasing = false;
 
@@ -23,6 +26,19 @@ public class EnemyPatrol : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         agent.stoppingDistance = stoppingDistance;
         agent.speed = 2f;
+
+        // Динамическое заполнение массива goals
+        GameObject[] patrolPoints = GameObject.FindGameObjectsWithTag("PatrolPoint");
+        goals = new Transform[patrolPoints.Length];
+        if (patrolPoints.Length == 0)
+        {
+            Debug.LogWarning("No objects with tag 'PatrolPoint' found!");
+        }
+        for (int i = 0; i < patrolPoints.Length; i++)
+        {
+            goals[i] = patrolPoints[i].transform;
+        }
+
         SetClosestGoal();
         en_Animator = gameObject.GetComponent<Animator>();
         en_Animator.SetBool("IsWalk", true);
@@ -36,6 +52,7 @@ public class EnemyPatrol : MonoBehaviour
         if (isChasing && player != null)
         {
             float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+          
             if (distanceToPlayer > stoppingDistance)
             {
                 agent.destination = player.position;
@@ -128,4 +145,32 @@ public class EnemyPatrol : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, chaseDistance);
     }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(hp);
+        }
+        else
+        {
+            hp = (int)stream.ReceiveNext();
+        }
+    }
+
+    public void OnHit()
+    {
+        // Только мастер-клиент обрабатывает урон
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+
+        hp -= 10;
+
+        if (hp <= 0 && !isDead)
+        {
+            isDead = true;
+            PhotonNetwork.Destroy(gameObject);
+        }
+    }
 }
+
