@@ -770,6 +770,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -1133,6 +1134,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -2352,6 +2354,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -6773422806959966771, guid: f82959de93571244d94b23823784b396, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 0e7159b7e3983b142baea0a7a3f3a001, type: 2}
+    - target: {fileID: -6731642633824212598, guid: f82959de93571244d94b23823784b396, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: b4ec259c18ceb5846b9074f2914c3ccd, type: 2}
     - target: {fileID: -3355418944440326445, guid: f82959de93571244d94b23823784b396, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -2376,6 +2386,14 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 2971016242597343542, guid: f82959de93571244d94b23823784b396, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 0e7159b7e3983b142baea0a7a3f3a001, type: 2}
+    - target: {fileID: 4531448965972253804, guid: f82959de93571244d94b23823784b396, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 0e7159b7e3983b142baea0a7a3f3a001, type: 2}
     - target: {fileID: 6178220964678725460, guid: f82959de93571244d94b23823784b396, type: 3}
       propertyPath: m_Layer
       value: 6

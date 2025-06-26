@@ -7,7 +7,7 @@ public class DayNightCycle : MonoBehaviourPunCallbacks
 {
     public float dayLengthInSeconds = 60f;
     private float rotationSpeed;
-    private float currentRotationX = 0f;
+    private float currentRotationX = 100f;
 
     void Start()
     {
