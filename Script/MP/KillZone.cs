@@ -13,7 +13,7 @@ public class KillZone : MonoBehaviour
                 PlayerController pc = other.GetComponent<PlayerController>();
                 if (pc != null)
                 {
-                    pc.pnView.RPC("RPC_KillZone", RpcTarget.All, 999f, "MapFall"); // 999 урона, "MapFall" Ч им€ убийцы
+                    pc.pnView.RPC("RPC_Damage", RpcTarget.All, 999f, "MapFall", true); // 999 урона, "MapFall" Ч им€ убийцы
                 }
             }
         }

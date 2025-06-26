@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
@@ -34,6 +34,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     public void Die()
     {
         PhotonNetwork.Destroy(controller);
-        CreateController();
+
+        if (ALLO.IsMine)
+        {
+            CreateController(); 
+        }
     }
+
 }

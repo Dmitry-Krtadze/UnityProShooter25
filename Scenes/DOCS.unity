@@ -7264,6 +7264,7 @@ GameObject:
   - component: {fileID: 297482173}
   - component: {fileID: 297482172}
   - component: {fileID: 297482174}
+  - component: {fileID: 297482175}
   m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
@@ -7344,12 +7345,24 @@ MeshCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 297482169}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &297482175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 297482169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bc75126bd440b144a04c28e583defbf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &301257039
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16819,9 +16832,41 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 547866324}
     - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
+      propertyPath: spawnPoints.Array.size
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
       propertyPath: objectsToSpawn.Array.size
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
+      propertyPath: spawnPoints.Array.data[0]
+      value: 
+      objectReference: {fileID: 815419270}
+    - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
+      propertyPath: spawnPoints.Array.data[1]
+      value: 
+      objectReference: {fileID: 1598644048}
+    - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
+      propertyPath: spawnPoints.Array.data[2]
+      value: 
+      objectReference: {fileID: 496632626}
+    - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
+      propertyPath: spawnPoints.Array.data[3]
+      value: 
+      objectReference: {fileID: 60148943}
+    - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
+      propertyPath: spawnPoints.Array.data[4]
+      value: 
+      objectReference: {fileID: 1266980629}
+    - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
+      propertyPath: spawnPoints.Array.data[5]
+      value: 
+      objectReference: {fileID: 1218528788}
+    - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
+      propertyPath: spawnPoints.Array.data[6]
+      value: 
+      objectReference: {fileID: 547866324}
     - target: {fileID: 4916538009665496813, guid: 8a936c46fa72dcb448d04106af0775af, type: 3}
       propertyPath: objectsToSpawn.Array.data[0]
       value: 
