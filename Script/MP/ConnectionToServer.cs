@@ -25,6 +25,7 @@ public class ConnectionToServer : MonoBehaviourPunCallbacks
     {
         WindowManager.Layout.OpenLayout("GameRoom");
         roomName.text = PhotonNetwork.CurrentRoom.Name;
+        Debug.Log("Joined room: " + PhotonNetwork.NickName);
 
         if (PhotonNetwork.IsMasterClient)
             startGameButton.SetActive(true);

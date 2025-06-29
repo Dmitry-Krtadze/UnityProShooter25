@@ -6,7 +6,7 @@ public class ShootGun : Gun
 {
     [SerializeField] Camera myCam;
     PlayerController playerC;
-
+    public GunInfo gunInfo;
     public override void Use()
     {
         Shoot();
@@ -14,7 +14,7 @@ public class ShootGun : Gun
 
     private void Shoot()
     {
-        GunInfo gunInfo = (GunInfo)itemInfo;
+        gunInfo = (GunInfo)itemInfo;
         if (gunInfo.isReloading) return;
 
         if (gunInfo.currentAmmo > 0)

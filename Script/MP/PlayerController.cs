@@ -4,6 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
+
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
@@ -329,6 +330,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
                 int hitViewID = hitPhotonView != null ? hitPhotonView.ViewID : -1;
                 pnView.RPC("RPC_SpawnImpactEffect", RpcTarget.All, hit.point, hit.normal, hitViewID);
 
+                if (hit.collider.CompareTag("Player"))
+                {
+                    PhotonView targetView = hit.collider.GetComponent<PhotonView>();
+                    if (targetView != null)
+                    {
+                        float damage = items[itemIndex].GetComponent<ShootGun>().gunInfo.Damage;
+                        targetView.RPC("RPC_Damage", RpcTarget.All, damage, PhotonNetwork.NickName, false);
+                    }
+                }
+
+
                 // Реакция на попадание в мишень
                 if (hit.collider.CompareTag("Target"))
                 {
@@ -462,7 +474,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     public void TakeDamage(float damage, string attacker, bool isMob)
     {
         Debug.Log($"TakeDamage called: damage={damage}, attacker={attacker}, isMob={isMob}");
-        if (!pnView.IsMine) return;
+  
 
         // Уменьшаем здоровье
         currentHealth -= damage;
@@ -489,31 +501,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     [PunRPC]
     void RPC_KillZone(float damage, string attacker)
     {
-        LeaderBoardManager.Instance.photonView.RPC("RPC_AddDeath", RpcTarget.MasterClient, PhotonNetwork.NickName);
-        LeaderBoardManager.Instance.photonView.RPC("RPC_AddKill", RpcTarget.MasterClient, attacker);
+        
         playerManager.Die();
     }
+
+
 
     [PunRPC]
     void RPC_Damage(float damage, string attacker, bool isMob)
     {
-        if (!pnView.IsMine) return;
-
-        currentHealth -= damage;
-        hpBarPlayer.text = "HP " + currentHealth.ToString() + "/ 100";
-        Debug.Log(attacker);
-        if (!isMob)
-        {
-            if (currentHealth <= 0)
-            {
-                LeaderBoardManager.Instance.photonView.RPC("RPC_AddDeath", RpcTarget.MasterClient, PhotonNetwork.NickName);
-                LeaderBoardManager.Instance.photonView.RPC("RPC_AddKill", RpcTarget.MasterClient, attacker);
-                playerManager.Die();
-            }
-        }
-       
-
-        pnView.RPC("RPC_UpdateHealth", RpcTarget.All, currentHealth);
+        TakeDamage(damage, attacker, isMob);
     }
 
     [PunRPC]

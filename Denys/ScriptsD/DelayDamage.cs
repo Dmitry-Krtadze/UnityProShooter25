@@ -24,7 +24,7 @@ public class DelayDamage : MonoBehaviour
         en_Animator = GetComponent<Animator>();
         if (en_Animator == null)
         {
-            Debug.LogError("Animator component is missing on " + gameObject.name);
+            //Debug.LogError("Animator component is missing on " + gameObject.name);
             enabled = false; // Отключаем скрипт
             return;
         }
@@ -33,7 +33,7 @@ public class DelayDamage : MonoBehaviour
         enemyPatrol = GetComponent<EnemyPatrol>();
         if (enemyPatrol == null)
         {
-            Debug.LogError("EnemyPatrol component is missing on " + gameObject.name);
+            //Debug.LogError("EnemyPatrol component is missing on " + gameObject.name);
             enabled = false; // Отключаем скрипт
             return;
         }
@@ -54,24 +54,24 @@ public class DelayDamage : MonoBehaviour
         // Если игрока нет или он уничтожен, ничего не делаем
         if (player == null || player.gameObject == null)
         {
-            Debug.Log("Player not found or destroyed.");
+            //Debug.Log("Player not found or destroyed.");
             return;
         }
 
         // Проверяем, проигрывается ли анимация атаки
         bool isAttacking = en_Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack");
-        Debug.Log("Is attacking: " + isAttacking);
+        //Debug.Log("Is attacking: " + isAttacking);
 
         // Проверяем, можно ли атаковать (прошло ли достаточно времени)
         bool canAttack = Time.time - lastAttackTime >= attackCooldown;
-        Debug.Log("Can attack: " + canAttack);
+        //Debug.Log("Can attack: " + canAttack);
 
         // Проверяем дистанцию до игрока
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
         if (distanceToPlayer <= attackRange)
         {
-            Debug.Log("Can Attack ");
+           // Debug.Log("Can Attack ");
             canAttack = true;
         }else{
             canAttack = false;

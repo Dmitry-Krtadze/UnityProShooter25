@@ -13,6 +13,7 @@ Material:
   m_InvalidKeywords:
   - _ENABLEPROBERELFECTIONS_ON
   - _ENABLEREALTIMEREFLECTIONS_ON
+  - _ENABLEREFLECTIONS_ON
   m_LightmapFlags: 5
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
