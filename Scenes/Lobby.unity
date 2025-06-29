@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.17361218, g: 0.21704571, b: 0.29915726, a: 1}
+  m_IndirectSpecularColor: {r: 0.17361209, g: 0.21704538, b: 0.2991568, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -467,6 +467,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1942102290945635839, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
@@ -1838,7 +1842,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &98952908
@@ -3175,6 +3179,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -3699,6 +3707,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1942102290945635839, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
@@ -4790,7 +4802,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &190721585
@@ -5027,6 +5039,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1942102290945635839, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
@@ -7966,6 +7982,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -8620,7 +8640,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &318118999
@@ -9824,6 +9844,10 @@ PrefabInstance:
     - target: {fileID: 3059296212561492385, guid: 713bbabdae7cc354ea95e1b209b541b8, type: 3}
       propertyPath: m_Size.z
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3059296212561492385, guid: 713bbabdae7cc354ea95e1b209b541b8, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6504047341156678981, guid: 713bbabdae7cc354ea95e1b209b541b8, type: 3}
       propertyPath: m_Name
@@ -11200,6 +11224,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -12197,6 +12225,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -12344,6 +12376,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1942102290945635839, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
@@ -12771,6 +12807,10 @@ PrefabInstance:
     - target: {fileID: 1942102290945635839, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: -21.97
+      objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -14661,6 +14701,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -14717,7 +14761,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &521711612
@@ -15555,6 +15599,10 @@ PrefabInstance:
     - target: {fileID: 1942102290945635839, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -18258,7 +18306,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &624864994
@@ -18485,7 +18533,6 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -20157,6 +20204,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1942102290945635839, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
@@ -22056,6 +22107,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -22704,6 +22759,10 @@ PrefabInstance:
     - target: {fileID: 8412785516204587761, guid: 9228a50188f228e47bd2f5602b36699c, type: 3}
       propertyPath: m_Size.z
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8412785516204587761, guid: 9228a50188f228e47bd2f5602b36699c, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9228a50188f228e47bd2f5602b36699c, type: 3}
@@ -23518,6 +23577,10 @@ PrefabInstance:
     - target: {fileID: 1942102290945635839, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -25502,7 +25565,12 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cube (63)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 8412785516204587761, guid: 9228a50188f228e47bd2f5602b36699c, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 8412785516204587761, guid: 9228a50188f228e47bd2f5602b36699c, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 9228a50188f228e47bd2f5602b36699c, type: 3}
 --- !u!4 &904972169 stripped
 Transform:
@@ -26210,6 +26278,10 @@ PrefabInstance:
     - target: {fileID: 3059296212561492385, guid: 713bbabdae7cc354ea95e1b209b541b8, type: 3}
       propertyPath: m_Size.z
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3059296212561492385, guid: 713bbabdae7cc354ea95e1b209b541b8, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6504047341156678981, guid: 713bbabdae7cc354ea95e1b209b541b8, type: 3}
       propertyPath: m_Name
@@ -27277,7 +27349,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &981718521
@@ -27916,6 +27988,10 @@ PrefabInstance:
     - target: {fileID: 1942102290945635839, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -29758,7 +29834,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &1074413740
@@ -32626,6 +32702,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -33548,6 +33628,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -34236,7 +34320,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1252344996
@@ -34792,6 +34876,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1942102290945635839, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
@@ -35629,6 +35717,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -36336,7 +36428,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1637584369}
-  m_RootOrder: 38
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1355343699
 MonoBehaviour:
@@ -37352,7 +37444,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1394555483
@@ -38548,6 +38640,25 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7759896269218922005, guid: be5f268a65d66414d9d2ccc551e020fe, type: 3}
   m_PrefabInstance: {fileID: 1449830787}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1455530135 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1147736345819989389, guid: 9228a50188f228e47bd2f5602b36699c, type: 3}
+  m_PrefabInstance: {fileID: 904972168}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &1455530139
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1455530135}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &1458002541
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -39380,7 +39491,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1484450444
@@ -39887,6 +39998,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90.099
       objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -39951,6 +40066,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1942102290945635839, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
@@ -41515,6 +41634,10 @@ PrefabInstance:
       propertyPath: m_Size.z
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3059296212561492385, guid: 713bbabdae7cc354ea95e1b209b541b8, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6504047341156678981, guid: 713bbabdae7cc354ea95e1b209b541b8, type: 3}
       propertyPath: m_Name
       value: Cube (57)
@@ -42255,7 +42378,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1608050414
@@ -42642,6 +42765,7 @@ Transform:
   - {fileID: 1020294164}
   - {fileID: 654146753}
   - {fileID: 213270382}
+  - {fileID: 1355343698}
   - {fileID: 1789793064}
   - {fileID: 1643737865}
   - {fileID: 489205337}
@@ -42664,7 +42788,6 @@ Transform:
   - {fileID: 2105586259}
   - {fileID: 189718996}
   - {fileID: 965717218}
-  - {fileID: 1355343698}
   - {fileID: 503300296}
   - {fileID: 59447638}
   m_Father: {fileID: 0}
@@ -44607,6 +44730,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -45038,6 +45165,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1942102290945635839, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
@@ -46789,7 +46920,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1763580193
@@ -47241,7 +47372,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1780206642
@@ -49254,7 +49385,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1862977253
@@ -49609,6 +49740,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1942102290945635839, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
@@ -50100,7 +50235,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3059296212561492385, guid: 713bbabdae7cc354ea95e1b209b541b8, type: 3}
       propertyPath: m_IsTrigger
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6504047341156678981, guid: 713bbabdae7cc354ea95e1b209b541b8, type: 3}
       propertyPath: m_Name
@@ -50322,7 +50457,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &1898406632
@@ -51059,7 +51194,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8412785516204587761, guid: 9228a50188f228e47bd2f5602b36699c, type: 3}
       propertyPath: m_IsTrigger
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9228a50188f228e47bd2f5602b36699c, type: 3}
@@ -51856,6 +51991,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1942102290945635839, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
@@ -53109,6 +53248,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -53401,6 +53544,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1942102290945635839, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
@@ -56111,7 +56258,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8412785516204587761, guid: 9228a50188f228e47bd2f5602b36699c, type: 3}
       propertyPath: m_IsTrigger
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9228a50188f228e47bd2f5602b36699c, type: 3}
@@ -56606,6 +56753,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1942102290945635839, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
@@ -57856,6 +58007,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1942102290945635839, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7239753899097786791, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
+      propertyPath: m_IsTrigger
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9118269143183107275, guid: abeb88d454bc9454a88e4fa55db85a8a, type: 3}
