@@ -4,6 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
@@ -159,6 +160,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageble
     {
         if (!pnView.IsMine)
             return;
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            PhotonNetwork.LeaveRoom();
+            SceneManager.LoadScene(0);
+        }
 
         Look();
         Movement(); // ������������ �������� � ������ � ����� ������
