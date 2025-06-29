@@ -87,6 +87,7 @@ public class ConnectionToServer : MonoBehaviourPunCallbacks
 
     public void LeaveRoom()
     {
+
         PhotonNetwork.LeaveRoom();
     }
 

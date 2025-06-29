@@ -36336,7 +36336,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1637584369}
-  m_RootOrder: 38
+  m_RootOrder: 32
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1355343699
 MonoBehaviour:
@@ -42419,7 +42419,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1622462223
 RectTransform:
   m_ObjectHideFlags: 0
@@ -42658,13 +42658,13 @@ Transform:
   - {fileID: 1885904189}
   - {fileID: 551898899}
   - {fileID: 1444300261}
+  - {fileID: 1355343698}
   - {fileID: 779903068}
   - {fileID: 1379943354}
   - {fileID: 384572706}
   - {fileID: 2105586259}
   - {fileID: 189718996}
   - {fileID: 965717218}
-  - {fileID: 1355343698}
   - {fileID: 503300296}
   - {fileID: 59447638}
   m_Father: {fileID: 0}
